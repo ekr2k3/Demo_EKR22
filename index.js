@@ -23,8 +23,7 @@ app.use('/', ex.static('./public'));
 var allRouter = require('./routers/sumaryRouter');
 allRouter(app);
 app.get('/', (req, res) => {
-    res.send(__dirname);
-    res.send(process.cwd());
+    res.send(__dirname + "  " + process.cwd());
 });
 
 app.listen(3000,()=>{
