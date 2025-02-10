@@ -19,7 +19,7 @@ app.use(methodOverride('_method'));
 //set up pug cho ứng dụng
 app.set('view engine', 'pug');
 app.set('views', __dirname + '/view');
-app.use('/', ex.static('./public'));
+app.use('/', ex.static(__dirname + '/public'));
 var allRouter = require('./routers/sumaryRouter');
 allRouter(app);
 app.get('/', (req, res) => {
