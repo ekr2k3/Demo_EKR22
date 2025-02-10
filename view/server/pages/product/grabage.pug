@@ -1,0 +1,25 @@
+﻿//- grabage.pug
+extend ../../layout/layout.pug
+block main-content
+    div(class='main w-5/6 bg-orange-100')  
+        table
+            thead 
+                tr 
+                    th= 'STT'
+                    th= 'img'
+                    th= 'name'
+                    th= 'action'
+            tbody
+                -for(var i = 0; i <data.length; i++){
+                    tr
+                        td 
+                            p= i 
+                        td 
+                            a(href="/product") 
+                                img(src = data[i].thumbnail)
+                        td= data[i].title
+                        td
+                            button(class = 'border-4 border-emerald-500 w-fit h-fit ml-6' class='d_f' id_r= data[i]._id)= 'Delete'
+                            button(class = 'border-4 border-emerald-500 w-fit h-fit ml-6' class='recover' id_r= data[i]._id)= 'kHÔI PHỤC'
+                -}
+    script(src="/js/server/grabage.js") 

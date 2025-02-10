@@ -1,0 +1,30 @@
+﻿/* product.css[admin] */
+.head{
+    position: fixed;
+    top: 0;
+    z-index: 1;
+}
+.sider{
+    position: fixed;
+    bottom: 0;
+}
+.main{
+    position: relative;
+    top: calc(100vh/6);
+    left: calc(100vw/6);
+    z-index: 0;
+}
+body{
+    overflow-x: hidden;
+}
+
+.A{
+    background-color: blueviolet;
+}
+
+.B{
+    background-color: rgb(26, 181, 150);
+}
+.active{
+    background-color: rgb(26, 181, 150);
+}

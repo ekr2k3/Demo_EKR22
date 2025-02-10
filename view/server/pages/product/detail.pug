@@ -1,0 +1,12 @@
+﻿//- detail.pug
+extend ../../layout/layout.pug
+block main-content
+    div(class='main w-5/6 bg-orange-100')
+        p= data.title
+        img(src = data.thumbnail)
+        p= data.description
+        p= data.price
+        p= data.discountPercentage
+        p= data.stock
+        p= data.position
+        p= data.status

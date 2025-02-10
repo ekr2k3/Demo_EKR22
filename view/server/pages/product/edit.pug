@@ -1,0 +1,44 @@
+﻿//- edit.pug
+extend ../../layout/layout.pug
+block main-content
+    div(class='main w-5/6 bg-orange-100')
+        form(action="/admin/product/edit/" + data._id +"?_method=PATCH", method="post", enctype="multipart/form-data") 
+            input(type="text", name="title", value=data.title)
+            br
+            br
+            textarea(name="description" )= data.description
+            br
+            br
+            input(type="number", name="price", value=data.price)
+            br
+            br
+            input(type="number", name="discountPercentage", value=data.discountPercentage)
+            br
+            br
+            input(type="number", name="stock", value=data.stock)
+            br
+            br
+            label(for="Thumbnail") Thumbnail
+            input(type="file", name="thumbnail" id="Thumbnail")
+            div(id='preview')
+            h3= "Ảnh cũ"
+            img(src= data.thumbnail , alt="", id='tem')
+            br
+            br
+            input(type="number", name="position", value = data.position)
+            br
+            br
+            if(data.status === 'active')
+                label(for="active") Active
+                input(type="radio", name="status", value="active" id="active" checked)
+                label(for="inactive") Inactive
+                input(type="radio", name="status", value="inactive" id="inactive")
+            else
+                label(for="active") Active
+                input(type="radio", name="status", value="active" id="active")
+                label(for="inactive") Inactive
+                input(type="radio", name="status", value="inactive" id="inactive" checked)
+            br
+            br
+            input(type="submit", value="edit Product" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded")
+    script(src="/js/server/preview.js")

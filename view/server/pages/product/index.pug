@@ -1,0 +1,100 @@
+﻿//- index.pug[product/server] 
+extend ../../layout/layout.pug
+block main-content
+    div(class='main w-5/6 bg-orange-100')
+        div(class = 'h-1/6 w-11/12 bg-orange-300 mx-auto  relative')
+            -if(messages.error){
+                div(class='error bg-red-500 text-white text-center')= messages.error
+            -}
+            -if(messages.success){
+                div(class='success bg-green-500 text-white text-center')= messages.success
+            -}
+            -for(var i = 0; i< 3 ; i++)
+                button(class = 'border-4 border-emerald-500 p-4 ml-2 ' + input1[i] , sta= input2[i])= input3[i]
+            form(action="/admin/product", method="get"  class = "absolute bottom-0 right-0")
+                input(type="text", name="title", placeholder="Search", value=info)
+                button(type="submit" class="bg-emerald-300" id='sear')= 'Search' 
+            form(action="", method="post" id='option')
+                select(name="option")
+                    option(value="" hidden)= "Chọn hành động"
+                    option(value="active")= "Hoạt động"
+                    option(value="inactive")= "Dừng hoạt động"
+                    option(value="delete")= "Xóa"
+                    option(value="position")= "Thay đổi vị trí"
+                input(type="text" hidden  name='ids')
+                button(type="submit")="gửi" 
+            a(href="/admin/product/add" class = 'border-2 border-emerald-500 ml-16')= 'Add item'
+        div(class = 'h-5/6 w-11/12 bg-orange-200 mx-auto')
+            table 
+                thead 
+                    tr 
+                        th= 'STT'
+                        th= 'img'
+                        th= 'price'
+                        th= 'name'
+                        th= 'status'
+                        th= 'action'
+                        th= 'position'
+                        th 
+                            input(type="checkbox", name="all")
+                            label(for="all")="click to check all" 
+                tbody
+                    -for(var i = 0; i< to.length ; i++){
+                        tr(class='border-4 border-emerald-500')
+                            td= i
+                            td
+                                a(href="/product") 
+                                    img(src = to[i].thumbnail)
+                            td= to[i].price
+                            td= to[i].title
+                            td
+                                button(id_item=to[i]._id, status=to[i].status)= to[i].status
+                            td(class = 'w-fit')
+                                a(href=`/admin/product/edit/${to[i]._id}` class = 'border-4 border-emerald-500 w-fit h-fit ml-2')= 'Edit'
+                                button(class = 'border-4 border-emerald-500 w-fit h-fit ml-6' class='B_D' id_r = to[i]._id)= 'Delete'
+                                button(class = 'border-4 border-emerald-500 w-fit h-fit ml-6' class='B_D_T' id_r = to[i]._id)= 'Delete temp'
+                                a(href=`/admin/product/detail/${to[i]._id}` class = 'border-4 border-emerald-500 w-fit h-fit ml-6')= 'Detail'
+                            td 
+                                input(type="number", class='position', id_item=to[i]._id, value=to[i].position)
+                            td
+                                input(type="checkbox", class='choice', id_item=to[i].id)
+                    -}
+        div 
+            ul(class='flex')
+                li(class='border-4 border-emerald-500 p-2') 
+                    button(id="next-b")= '<'
+                -for(var i = 0; i< totalPage ; i++){
+                    -if(i == 0){
+                        -if(current == i){
+                            li(class='border-4 border-emerald-500 p-2 active') 
+                                button(page=`${i}`)= i
+                        -}
+                        -else{
+                            li(class='border-4 border-emerald-500 p-2') 
+                                button(page=`${i}`)= i
+                        -}
+                    -}
+                    -else{
+                        -if(current == i){
+                            li(class='border-4 border-emerald-500 p-2 active') 
+                                button(page=`${i}`)= i
+                        -}
+                        -else{
+                            li(class='border-4 border-emerald-500 p-2') 
+                                button(page=`${i}`)= i
+                        -}
+                    -}
+                -}
+                li(class='border-4 border-emerald-500 p-2') 
+                    button(id="next-b")= '>'
+                    p(style = 'display: none' prefix = PREFIX_SERVER)
+        form(action="", method="post" id='form-co' style = 'display: none')
+        script(src="/js/server/status.js") 
+        script(src="/js/server/search.js")
+        script(src="/js/server/Phan_trang.js")
+        script(src="/js/server/changeone.js")
+        script(src="/js/server/changeMany.js")
+        script(src="/js/server/delete_data.js")
+        script(src="/js/server/delete_temp.js") 
+        script(src="/js/server/position.js")
+        script(src="/js/server/messages_flash.js") 

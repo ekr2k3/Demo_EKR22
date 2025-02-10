@@ -1,0 +1,13 @@
+﻿//- layout.pug 
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        script(src="https://cdn.tailwindcss.com")
+        link(rel="stylesheet", href="/css/server/product.css")
+        title Document
+    body(class="bg-stone-600 relative w-screen h-screen")
+        include ../partials/header.pug
+        include ../partials/sider.pug
+        block main-content
