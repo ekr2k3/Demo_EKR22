@@ -35,7 +35,9 @@ app.get('/', (req, res) => {
     logWithHiddenChars(process.cwd());
     res.send(__dirname + "  " + process.cwd());
 });
-
+app.get('/env', (req, res) => {
+    res.send(process.env.api_key);
+});
 app.listen(3000, () => {
     console.log('run at 3000');
     console.log('at index.js-' + process.env.A + process.env.B);
