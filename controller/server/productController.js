@@ -1,5 +1,6 @@
 ﻿// productController.js 
 const { connection } = require('mongoose');
+var uploadsFunction = require('../../config/configUpload.js');
 var modelP = require('../../models/itemPhone.js');
 module.exports.getProduct = async (req, res) => {
     var condition = {};
@@ -69,7 +70,7 @@ module.exports.changeStatus = async (req, res) => {
         data[0].status = status;
         await data[0].save();
     }
-    else{
+    else {
         req.flash('error', 'Không tìm thấy sản phẩm');
     }
     req.flash('success', 'Thay đổi trạng thái thành công');
@@ -173,17 +174,19 @@ module.exports.addProduct = async (req, res) => {
     res.render('server/pages/product/add.pug');
 };
 
-module.exports.addProductPost = async (req, res) => {
-    var data = req.body; // req.body là cái được gửi tới 
-    // do các ô input có name là title, price, status, position, description
-    //  giống với các key của schema
-    //--> không cần tạo object thông tin nữa mà dùng luôn cái này làm object thông tin
-    var thumbnail = req.files.thumbnail[0].filename;
-    // lưu vào data thì cần phải url đúng --> chỉnh lại 1 chút rồi add vào object data
-    data.thumbnail = `/uploads/${thumbnail}`;
-    var product = new modelP(data);
-    await product.save();
-    res.redirect('/admin/product');
+module.exports.addProductPost = (req, res) => {
+    var myPromiseUpload = uploadsFunction(req.files.thumbnail[0].buffer);
+    myPromiseUpload
+        .then(async (result) => {
+            var data = req.body; // req.body là cái được gửi tới 
+            // do các ô input có name là title, price, status, position, description
+            //  giống với các key của schema
+            //--> không cần tạo object thông tin nữa mà dùng luôn cái này làm object thông tin
+            data.thumbnail = result.url;
+            var product = new modelP(data);
+            await product.save();
+            res.redirect('/admin/product');
+        });
 }
 
 module.exports.detailProduct = async (req, res) => {
@@ -202,17 +205,20 @@ module.exports.editProduct = async (req, res) => {
     });
 }
 
-module.exports.editProductPatch = async (req, res) => {
-    var id = req.params.id;
-    var data = req.body;
-    if (req.files.thumbnail) {
-        var thumbnail = req.files.thumbnail[0].filename;
-        data.thumbnail = `/uploads/${thumbnail}`;
-    }
-    else{
-        var record = await modelP.find({ _id: id });
-        data.thumbnail = record[0].thumbnail;
-    }
-    await modelP.updateOne({ _id: id }, data);
-    res.redirect('/admin/product');
+module.exports.editProductPatch = (req, res) => {
+    var myPromiseUpload = uploadsFunction(req.files.thumbnail[0].buffer);
+    myPromiseUpload
+        .then(async (result) => {
+            var id = req.params.id;
+            var data = req.body;
+            if (req.files.thumbnail) {
+                data.thumbnail = result.url;
+            }
+            else { // nếu không có file ảnh mới thì cập nhật cho bằng file cũ tương đương không cập nhật
+                var record = await modelP.find({ _id: id });
+                data.thumbnail = record[0].thumbnail;
+            }
+            await modelP.updateOne({ _id: id }, data);
+            res.redirect('/admin/product');
+        });
 }
