@@ -11,5 +11,10 @@
             "src": "/(.*)",
             "dest": "index.js"
         }
-    ]
+    ],
+    "env": {
+        "CLOUD_NAME": "dud8odlyw",
+        "API_KEY": "573137813583967",
+        "API_SECRET": "cfG0o8JYP7ThH3HRoXGT5NI6zuA"
+    }
 }
