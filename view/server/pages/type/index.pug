@@ -1,0 +1,75 @@
+﻿//-index.pug
+extend ../../layout/layout.pug
+block main-content
+
+
+    -function findNameCha(id_of_parent){
+        -for(var i = 0; i<DataTypes.length; i++){
+            -if(id_of_parent == DataTypes[i]._id){
+                -return DataTypes[i].name
+            -}
+        -}
+        -return "";
+    -}
+
+    -var newDataTypes = [];
+    -var Sort_DATA_like_DFS = (current_node) =>{
+        -newDataTypes.push(current_node);
+        //- search child of curr_node
+        -for(var i = 0; i < DataTypes.length; i++){
+            //- Duyệt từ đầu nếu gặp node có parent_id = id node hiện tại
+            -if(current_node._id == DataTypes[i].parent_id){
+                //- Thì in node đó ra và search tiếp con của node đó
+                -Sort_DATA_like_DFS(DataTypes[i])
+            -}
+        -}
+    -}
+
+    -for(var i = 0; i< DataTypes.length; i++){
+        -if(DataTypes[i].parent_id == "root"){
+            -Sort_DATA_like_DFS(DataTypes[i]);
+        -}
+    -}
+
+    -DataTypes = newDataTypes;
+    
+
+    div(class='main w-5/6 bg-orange-100')
+        a(href="/admin/type/create" class = 'border-2 border-emerald-500 ml-16')= '+ New item'
+
+        div(class = 'h-5/6 w-11/12 bg-orange-200 mx-auto')
+            table 
+                thead 
+                    tr 
+                        th= 'STT'
+                        th= 'img'
+                        th= 'name'
+                        th= 'Item cha'
+                        th= 'status'
+                        th= 'action'
+                        th= 'position'
+                        th 
+                            input(type="checkbox", name="all")
+                            label(for="all")="click to check all" 
+                tbody
+                    -for(var i = 0; i< DataTypes.length ; i++){
+                        tr(class='border-4 border-emerald-500')
+                            td= i
+                            td
+                                a(href="/") 
+                                    img(src = DataTypes[i].thumbnail, height = 70, width = 70)
+                            td= DataTypes[i].name
+                            -var x = findNameCha(DataTypes[i].parent_id)
+                            td= x
+                            td
+                                button(id_item=DataTypes[i]._id, status=DataTypes[i].status)= DataTypes[i].status
+                            td(class = 'w-fit')
+                                a(href=`/admin/type/edit/${DataTypes[i]._id}` class = 'border-4 border-emerald-500 w-fit h-fit ml-2')= 'Edit'
+                                button(class = 'border-4 border-emerald-500 w-fit h-fit ml-6' class='B_D' id_r = DataTypes[i]._id)= 'Delete'
+                                button(class = 'border-4 border-emerald-500 w-fit h-fit ml-6' class='B_D_T' id_r = DataTypes[i]._id)= 'Delete temp'
+                                a(href=`#` class = 'border-4 border-emerald-500 w-fit h-fit ml-6')= 'Detail'
+                            td 
+                                input(type="number", class='position', id_item=DataTypes[i]._id, value=DataTypes[i].position)
+                            td
+                                input(type="checkbox", class='choice', id_item=DataTypes[i].id)
+                    -}

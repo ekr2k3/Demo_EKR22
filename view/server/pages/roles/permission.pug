@@ -1,0 +1,111 @@
+//- [role]/permission.pug
+extend ../../layout/layout.pug
+block main-content
+    div(class='main w-5/6 bg-orange-100')
+        table 
+            thead 
+                tr 
+                    th= "Permission"
+                    -for (let i = 0; i < roles.length; i++)
+                        th= roles[i].title
+            //- Body 1
+            tbody
+                //- Tên body 1
+                tr 
+                    td(colspan=roles.length + 1, style="font-weight: bold; text-align: center")= "Product"
+                //- Quyền 1 cho body 1
+                tr 
+                    td= "Thêm"
+                    -for (let i = 0; i < roles.length; i++)
+                        td
+                            input(type='checkbox' x=roles[i]._id y="TP")
+                //- Quyền 2 cho body 1
+                tr 
+                    td= "xóa"
+                    -for (let i = 0; i < roles.length; i++)
+                        td
+                            input(type='checkbox' x=roles[i]._id y="XP")
+            //- Body 2
+            tbody
+                //- Tên body 2
+                tr 
+                    td(colspan=roles.length + 1, style="font-weight: bold; text-align: center")= "Type"
+                //- Quyền 2 cho body 2
+                tr 
+                    td= "Thêm"
+                    -for (let i = 0; i < roles.length; i++)
+                        td
+                            input(type='checkbox' x=roles[i]._id y="TT")
+            
+        button(type="submit" style="border: solid; padding : 4px") Update!!! 
+        //- Form ẩn
+        form(action="", method="post", style="display: none", id="formPermission01")
+            input(type="text", name="ok")
+        //- Ô input ẩn để gửi dữ liệu server gửi tới
+        textarea(name="dataRole" style="display:none")= JSON.stringify(roles)
+        script.
+            var button = document.querySelector("button");
+            button.onclick = (e)=>{
+                //- Lấy ra các checkbox đã được check
+                var checkBoxChecked = document.querySelectorAll("input[type='checkbox']:checked");
+                //- Lý do phải để ở trong onclick vì cần lấy dữ liệu sau khi nhấn nút chứ không phải ngay khi tải trang
+                //- Tạo cấu trúc dữ liệu
+                data = [];
+                for(let i = 0; i < checkBoxChecked.length; i++){
+                    var x = checkBoxChecked[i].getAttribute("x");
+                    var y = checkBoxChecked[i].getAttribute("y");
+                    if(data.length == 0){
+                        ob = {};
+                        ob.x = x;
+                        ob.permission = [];
+                        ob.permission.push(y);
+                        data.push(ob);
+                    }
+                    else{
+                        // Biến đánh dấu
+                        var check = false;
+                        // Duyệt qua các phần tử của data nếu x đã có trong data thì thêm y vào permission
+                        for(let j = 0; j < data.length; j++){
+                            if(data[j].x == x){
+                                data[j].permission.push(y);
+                                check = true;
+                                break;
+                            }
+                        }
+                        // Nếu duyệt qua mà không tháy x thì thêm x và y vào data
+                        if(check == false){
+                            ob = {};
+                            ob.x = x;
+                            ob.permission = [];
+                            ob.permission.push(y);
+                            data.push(ob);
+                        }
+                    }
+                }
+                //- convert dữ liệu thành chuỗi json
+                var dataJson = JSON.stringify(data);
+                var form = document.querySelector("#formPermission01");
+                var input = form.querySelector("input");
+                input.value = dataJson;
+                form.setAttribute("action", "/admin/role/permission?_method=PATCH");
+                form.submit();
+            }
+            var reload = ()=>{
+                var dataRole = document.querySelector("textarea[name='dataRole']").innerHTML;
+                dataRole = JSON.parse(dataRole);
+                var checkBox = document.querySelectorAll("input[type='checkbox']");
+                for(let i = 0; i < dataRole.length; i++){
+                    for(let j = 0; j < checkBox.length; j++){
+                        // Đúng OX
+                        if(dataRole[i]._id == checkBox[j].getAttribute("x")){
+                            for(let k = 0; k < dataRole[i].permission.length; k++){
+                                //Đúng Oy
+                                if(dataRole[i].permission[k] == checkBox[j].getAttribute("y")){
+                                    checkBox[j].checked = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            reload();

@@ -2,6 +2,62 @@
 const { connection } = require('mongoose');
 var uploadsFunction = require('../../config/configUpload.js');
 var modelP = require('../../models/itemPhone.js');
+var typeModel = require('../../models/types.model.js');
+var sortData = (req, data) => {
+    var typeSort = req.query.typeSort;
+    var valueSort = req.query.valueSort;
+    switch (typeSort) {
+        case 'position':
+            if (valueSort == 'asc') {
+                data.sort((a, b) => {
+                    return a.position - b.position;
+                });
+            }
+            else {
+                data.sort((a, b) => {
+                    return b.position - a.position;
+                });
+            }
+            break;
+        case 'price':
+            if (valueSort == 'asc') {
+                data.sort((a, b) => {
+                    return a.price - b.price;
+                });
+            }
+            else {
+                data.sort((a, b) => {
+                    return b.price - a.price;
+                });
+            }
+            break;
+        case 'title':
+            function compareAlphabet(str1, str2) {
+                const len = Math.min(str1.length, str2.length);
+
+                for (let i = 0; i < len; i++) {
+                    if (str1[i] < str2[i]) return -1;
+                    if (str1[i] > str2[i]) return 1;
+                }
+
+                if (str1.length < str2.length) return -1;
+                if (str1.length > str2.length) return 1;
+
+                return 0;
+            }
+            // bubble sort
+            for (let i = 0; i < data.length - 1; i++) {
+                for (let j = i + 1; j < data.length; j++) {
+                    if (compareAlphabet(data[i].title, data[j].title) > 0) {
+                        const temp = data[i];
+                        data[i] = data[j];
+                        data[j] = temp;
+                    }
+                }
+            }
+    }
+    return data;
+}
 module.exports.getProduct = async (req, res) => {
     var condition = {};
     condition.deleted = false;
@@ -32,7 +88,8 @@ module.exports.getProduct = async (req, res) => {
     var currentPage = 0; // default
     var totalPage = 0;
     if (DATA.length % elementPerPage > 0) {
-        totalPage = (DATA.length / elementPerPage) + 1; // Do chia nguyên sẽ làm tròn xuống
+        totalPage = Math.ceil(DATA.length / elementPerPage); //làm tròn lên
+        console.log(totalPage);
     }
     else {
         totalPage = DATA.length / elementPerPage;
@@ -48,6 +105,7 @@ module.exports.getProduct = async (req, res) => {
         newData.push(DATA[i]);
     }
     DATA = newData;
+    DATA = sortData(req, DATA);
     res.render('./server/pages/product/index.pug', {
         to: DATA,
         input1: input1,
@@ -171,7 +229,11 @@ module.exports.GrabagePATCH2 = async (req, res) => {
 }
 
 module.exports.addProduct = async (req, res) => {
-    res.render('server/pages/product/add.pug');
+    var condition= {};
+    var data = await typeModel.find(condition);
+    res.render('server/pages/product/add.pug',{
+        dType: data
+    });
 };
 
 module.exports.addProductPost = (req, res) => {
@@ -200,25 +262,33 @@ module.exports.detailProduct = async (req, res) => {
 module.exports.editProduct = async (req, res) => {
     var id = req.params.id;
     var data = await modelP.find({ _id: id });
+    var dataType = await typeModel.find({
+        deleted: false
+    });
     res.render('server/pages/product/edit.pug', {
-        data: data[0]
+        data: data[0],
+        dataT: dataType
     });
 }
 
-module.exports.editProductPatch = (req, res) => {
-    var myPromiseUpload = uploadsFunction(req.files.thumbnail[0].buffer);
-    myPromiseUpload
-        .then(async (result) => {
-            var id = req.params.id;
-            var data = req.body;
-            if (req.files.thumbnail) {
+module.exports.editProductPatch = async (req, res) => {
+    if (req.files.thumbnail) {
+        var myPromiseUpload = uploadsFunction(req.files.thumbnail[0].buffer);
+        myPromiseUpload
+            .then(async (result) => {
+                var id = req.params.id;
+                var data = req.body;
                 data.thumbnail = result.url;
-            }
-            else { // nếu không có file ảnh mới thì cập nhật cho bằng file cũ tương đương không cập nhật
-                var record = await modelP.find({ _id: id });
-                data.thumbnail = record[0].thumbnail;
-            }
-            await modelP.updateOne({ _id: id }, data);
-            res.redirect('/admin/product');
-        });
+                await modelP.updateOne({ _id: id }, data);
+                res.redirect('/admin/product');
+            });
+    }
+    else { // nếu không có file ảnh mới thì cập nhật cho bằng file cũ tương đương không cập nhật
+        var id = req.params.id;
+        var data = req.body;
+        var record = await modelP.find({ _id: id });
+        data.thumbnail = record[0].thumbnail;
+        await modelP.updateOne({ _id: id }, data);
+        res.redirect('/admin/product');
+    }
 }

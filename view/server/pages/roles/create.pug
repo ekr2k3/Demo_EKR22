@@ -1,0 +1,10 @@
+//- [role]/create.pug
+extend ../../layout/layout.pug
+block main-content
+    div(class='main w-5/6 bg-orange-100')
+        form(action="/admin/role/create", method="post") 
+            p= "Name Role"
+            input(type="text", name="title")
+            p= "Description"
+            textarea(name="description")
+            button(type="submit" class='border-2 border-emerald-500 ml-16')= "Create" 

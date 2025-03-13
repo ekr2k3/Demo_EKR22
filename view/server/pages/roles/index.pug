@@ -1,0 +1,25 @@
+//- [roles]/index.pug
+extend ../../layout/layout.pug
+block main-content
+    div(class='main w-5/6 bg-orange-100')
+        a(href="/admin/role/create" class = 'border-2 border-emerald-500 ml-16')= '+ New role'
+
+        div(class = 'h-5/6 w-11/12 bg-orange-200 mx-auto')
+            table 
+                thead 
+                    tr 
+                        th= 'STT'
+                        th= 'name'
+                        th= 'description'
+                        th= 'action'
+                tbody
+                    -for(var i = 0; i< DataRoles.length ; i++){
+                        tr(class='border-4 border-emerald-500')
+                            td= i
+                            td= DataRoles[i].title
+                            td= DataRoles[i].description
+                            td 
+                                a(href=`/admin/role/edit/${DataRoles[i]._id}`)= 'Edit'
+                                a(href=`/admin/role/delete/${DataRoles[i]._id}`)= 'Delete'
+                                a(href=`/admin/role/detail/${DataRoles[i]._id}`)= 'Detail'
+                    -}

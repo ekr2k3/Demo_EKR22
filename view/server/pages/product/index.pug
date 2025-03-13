@@ -63,7 +63,8 @@ block main-content
             ul(class='flex')
                 li(class='border-4 border-emerald-500 p-2') 
                     button(id="next-b")= '<'
-                -for(var i = 0; i< totalPage ; i++){
+                -for(var i = 0; i<= totalPage ; i++){
+                    p= totalPage
                     -if(i == 0){
                         -if(current == i){
                             li(class='border-4 border-emerald-500 p-2 active') 
@@ -88,6 +89,15 @@ block main-content
                 li(class='border-4 border-emerald-500 p-2') 
                     button(id="next-b")= '>'
                     p(style = 'display: none' prefix = PREFIX_SERVER)
+        select(name="sort" id='sort_select')
+            option(value="" hidden)= "Chọn phương pháp sắp xếp"
+            option(value="position-asc")= "Vị trí tăng dần"
+            option(value="position-desc")= "Vị trí giảm dần"
+            option(value="price-asc")= "Giá tăng dần"
+            option(value="price-desc")= "Giá giảm dần"
+            option(value="title-asc")= "a-z"
+            option(value="title-desc")= "z-a"
+        button(id='sort_button')= 'Sort'
         form(action="", method="post" id='form-co' style = 'display: none')
         script(src="/js/server/status.js") 
         script(src="/js/server/search.js")
@@ -97,4 +107,5 @@ block main-content
         script(src="/js/server/delete_data.js")
         script(src="/js/server/delete_temp.js") 
         script(src="/js/server/position.js")
-        script(src="/js/server/messages_flash.js") 
+        script(src="/js/server/messages_flash.js")
+        script(src="/js/server/sort.js") 

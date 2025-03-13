@@ -1,0 +1,20 @@
+//- [role]/edit.pug
+extend ../../layout/layout.pug
+block main-content
+    div(class='main w-5/6 bg-orange-100')
+        form(action="", method="post" id="formEdit01", idData = DataRole._id) 
+            p= "Name Role"
+            input(type="text", name="title" value = DataRole.title)
+            p= "Description"
+            textarea(name="description")= DataRole.description
+            button(type="submit" class='border-2 border-emerald-500 ml-16' id='buttonedit01')= "update" 
+    script.
+        var buttonedit01 = document.getElementById('buttonedit01')
+        buttonedit01.onclick = (e)=>{
+            e.preventDefault();
+            var form = document.getElementById('formEdit01');
+            var id = form.getAttribute('idData');
+            var action = `/admin/role/edit/${id}?_method=PATCH`;
+            form.setAttribute('action', action);
+            form.submit();
+        }

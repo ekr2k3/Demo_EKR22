@@ -12,7 +12,8 @@ ob =   {
     "deleted": {
         type: Boolean,
         default: false
-    }
+    },
+    "Thuoc_danh_muc": String
   };
 var schema = mongoose.Schema; // trỏ tới constructor schema
 var schemePhone = new schema(ob)

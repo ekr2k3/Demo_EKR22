@@ -20,6 +20,7 @@ app.use(methodOverride('_method'));
 app.set('view engine', 'pug');
 app.set('views', __dirname+ '/view');
 app.use('/', ex.static(__dirname + '/public'));
+app.use("/tinymce", ex.static(`${__dirname}/node_modules/tinymce`));
 var allRouter = require('./routers/sumaryRouter');
 allRouter(app);
 app.get('/', (req, res) => {

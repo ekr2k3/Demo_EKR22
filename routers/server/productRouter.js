@@ -17,6 +17,7 @@ router.patch('/grabage/:id', productController.GrabagePATCH);
 router.delete('/grabage/:id', productController.GrabageDelete);
 
 router.get('/add', productController.addProduct);
+
 var middlewareUpload = multer.fields(
     [
         { name: 'thumbnail', maxCount: 1 }

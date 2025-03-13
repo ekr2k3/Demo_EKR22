@@ -35,6 +35,24 @@ block main-content
             input(type="radio", name="status", value="inactive" id="inactive")
             br
             br
+            -var searchChild = (symbol, curr_node) => {
+                option(value=curr_node._id)= symbol +  curr_node.name
+                //- tìm con
+                -for(var i = 0; i<dType.length; i++){
+                    -if(curr_node._id == dType[i].parent_id){
+                        -searchChild(symbol + '*', dType[i])
+                    -}
+                -}
+            -}
+            select(name="Thuoc_danh_muc")
+                option(value="" hidden)= "Sản phẩm thuộc danh mục ?"
+                -for(var i = 0; i<dType.length; i++){
+                    -if(dType[i].parent_id == "root"){
+                        -searchChild('*', dType[i]) 
+                    -}
+                -} 
+            br
+            br
             input(type="submit", value="Add Product" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded")
     script(src="/js/server/preview.js")
     

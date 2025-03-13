@@ -2,6 +2,8 @@
 extend ../../layout/layout.pug
 block main-content
     div(class='main w-5/6 bg-orange-100')
+        -var m = data.Thuoc_danh_muc
+        -console.log("m=" + m)
         form(action="/admin/product/edit/" + data._id +"?_method=PATCH", method="post", enctype="multipart/form-data") 
             input(type="text", name="title", value=data.title)
             br
@@ -38,6 +40,29 @@ block main-content
                 input(type="radio", name="status", value="active" id="active")
                 label(for="inactive") Inactive
                 input(type="radio", name="status", value="inactive" id="inactive" checked)
+            br
+            br
+            - var print_node_and_search = (symbo, cur_node)=>{
+                if(cur_node._id == data.Thuoc_danh_muc)
+                    option(value=cur_node._id, selected)= symbo + cur_node.name
+                else 
+                    option(value=cur_node._id)= symbo + cur_node.name
+                //- search child of curr_node
+                -for(var i = 0; i < dataT.length; i++){
+                    //- Duyệt từ đầu nếu gặp node có parent_id = id node hiện tại
+                    -if(cur_node._id == dataT[i].parent_id){
+                        //- Thì in node đó ra và search tiếp con của node đó
+                        -print_node_and_search(symbo + '*', dataT[i])
+                    -}
+                -}
+            -}
+            select(name="Thuoc_danh_muc")
+                option(value="" hidden)= "Chọn Thuoc_danh_muc"
+                -for(var i = 0; i< dataT.length; i++){
+                    -if(dataT[i].parent_id == "root"){
+                        -print_node_and_search('*', dataT[i]);
+                    -}
+                -}
             br
             br
             input(type="submit", value="edit Product" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded")
