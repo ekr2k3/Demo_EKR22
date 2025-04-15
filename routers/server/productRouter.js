@@ -6,10 +6,12 @@ var router = ex.Router();
 var productController = require('../../controller/server/productController');
 var productValidation = require('../../validation/product.validation.js');
 router.get('/', productController.getProduct);
-
+// sửa status 1 item
 router.patch('/:id/:status/hi', productController.changeStatus);
+// Xóa mềm, change status... Nhiều item
 router.patch('/', productController.changeMany);
 router.delete('/delete/:id', productController.delete_data);
+// xóa mềm 1 item
 router.delete('/delete_t/:id', productController.delete_p);
 router.get('/grabage', productController.GrabageGET);
 
@@ -26,6 +28,5 @@ var middlewareUpload = multer.fields(
 router.post('/add', middlewareUpload, productValidation.validation_create, productController.addProductPost);
 router.get('/detail/:id', productController.detailProduct);
 router.get('/edit/:id', productController.editProduct);
-
 router.patch('/edit/:id', middlewareUpload, productValidation.validation_update, productController.editProductPatch);
 module.exports = router;

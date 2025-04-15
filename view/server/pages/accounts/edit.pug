@@ -1,0 +1,96 @@
+//- edit.pug [accounts]
+extend ../../layout/layout.pug
+block main-content
+    div(class='main w-5/6 bg-orange-100')
+        -if(messages.error){
+                div(class='error bg-red-500 text-white text-center' id='error')= messages.error
+        -}
+        -if(dataAcc){
+            form(action=dataAcc._id, method="post", enctype="multipart/form-data") 
+                input(type="text", name="fullname", value=dataAcc.fullname)
+                br
+                br
+                input(type="email", name="email" placeholder="email", value=dataAcc.email)
+                br
+                br
+                input(type="input", name="phone", placeholder="phon_number", value=dataAcc.phone)
+                br
+                br
+                select(name="role_id")
+                    -for(let role of dataRole)
+                        -if(role.id == dataAcc.role_id)
+                            option(value=role.id, selected)= role.title
+                        -else
+                            option(value=role.id)= role.title
+                br
+                br
+                if(dataAcc.status == 'active')
+                    label(for="active") Active
+                    input(type="radio", name="status", value="active", id="active", checked)
+                    label(for="inactive") Inactive
+                    input(type="radio", name="status", value="inactive", id="inactive")
+                else
+                    label(for="active") Active
+                    input(type="radio", name="status", value="active", id="active")
+                    label(for="inactive") Inactive
+                    input(type="radio", name="status", value="inactive", id="inactive", checked)
+                br
+                br
+                input(type="file", name="avata")
+                div(id='preview')
+                h3= "Ảnh cũ"
+                img(src= dataAcc.avata , alt="", id='tem')
+                br
+                br
+                input(type="password", name="password" placeholder="new password" style="display:none")
+                input(type="checkbox", id="cPa")
+                label(for="cPa")= "New Password"
+                input(type="submit", value="edit Account" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded")
+        -}
+    script.
+        var inputFile = document.querySelector('input[name="avata"]'); // Lấy vị trí của input ảnh
+        var img_tem = document.querySelector('#tem'); // Lấy vị trí của ảnh cũ
+        var img = document.createElement('img'); // Tạo một thẻ img mới
+        inputFile.onchange = (event)=>{ // Khi input ảnh thay đổi
+            if(img_tem){ // Nếu có ảnh cũ
+                img_tem.remove(); // Xóa ảnh cũ
+            }
+            var file = event.target.files[0]; // Lấy file ảnh hiện tại
+            var url = URL.createObjectURL(file); // Tạo url cho ảnh
+            img.setAttribute('src', url); // Gán url cho ảnh
+            var preview = document.getElementById('preview'); // Lấy vị trí của div preview
+            preview.setAttribute('style', 'width:20vw'); // Thay đổi kích thước của div preview
+            preview.appendChild(img);// Thêm ảnh vào div preview
+        }
+        
+        // Xóa thông báo nếu có sau 3s
+        var error = document.getElementById('error');
+        
+        if(error){
+            setTimeout(()=>{
+                error.style.display = 'none';
+            }, 3000);
+        }
+
+        // checkbox hiện or đóng trường new password
+        var cPa = document.getElementById('cPa');
+        var password = document.querySelector('input[name="password"]');
+        
+        cPa.onclick = ()=>{
+            if(cPa.checked == true){
+                password.style.display = 'block';
+            }else{
+                password.style.display = 'none';
+            }
+        }
+
+        // Đổi từ post --> patch
+        var inputSubmit = document.querySelector('input[type="submit"]');
+        var form = document.querySelector('form');
+        inputSubmit.onclick = (event)=>{
+            event.preventDefault();
+            var id = form.getAttribute('action'); // đã gán id bản ghi cho action
+            var action = "/admin/accounts/edit/" + id + "?_method=PATCH";
+            form.setAttribute('action', action);
+            form.submit();
+        }

@@ -1,12 +1,40 @@
 ﻿//- header.pug
+- var x = (cur_node) => {
+  li 
+    a(href="/product/" + cur_node._id)  #{cur_node.name}
+    - var childNodes = []
+    - for (var i = 0; i < data.length; i++) {
+      - if (data[i].parent_id == cur_node._id) {
+        - childNodes.push(data[i])
+      - }
+    - }
+    - if (childNodes.length > 0) {
+      ul
+        - for (var i = 0; i < childNodes.length; i++) {
+          - x(childNodes[i])
+        - }
+    - }
+-}
+
 .container
   header.d-flex.flex-wrap.justify-content-center.py-3.mb-4.border-bottom
     a.d-flex.align-items-center.mb-3.mb-md-0.me-md-auto.link-body-emphasis.text-decoration-none(href='/home')
-      img(src="/img/server/ABC.jpg", alt="None", width='40', height='32')
+      img(src="/img/server/ABC.jpg" alt="None" width='40' height='32')
       span.fs-4 Simple header
     ul.nav.nav-pills
       li.nav-item
         a.nav-link.active(href='/home' aria-current='page') Home
-      li.nav-item
-        a.nav-link(href='/product') Products
-      
+      li.nav-item(class="submenu")
+        a(href="/product") Sản phẩm
+        ul
+          - for (var i = 0; i < data.length; i++) {
+            - if (data[i].parent_id == "root") {
+              - x(data[i])
+            - }
+          - }
+
+
+
+
+
+

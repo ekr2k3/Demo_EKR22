@@ -106,6 +106,7 @@ module.exports.getProduct = async (req, res) => {
     }
     DATA = newData;
     DATA = sortData(req, DATA);
+    console.log("token is" + res.locals.user.token);
     res.render('./server/pages/product/index.pug', {
         to: DATA,
         input1: input1,
@@ -122,8 +123,23 @@ module.exports.changeStatus = async (req, res) => {
     condition._id = req.params.id; //Chú ý dùng _id chứ không phải id
     var status = req.params.status;
     var data = await modelP.find(condition);
-    console.log(data);
-    console.log(condition.id);
+    //Tạo array chứa data cũ
+    var a_e = [];
+    if (data[0].edit) {
+        a_e = data[0].edit;
+    }
+    else {
+        a_e = [];
+    }
+    // tạo object
+    var e = {};
+    e.edit_at = Date.now();
+    if (res.locals.user) {
+        e.edit_by = res.locals.user.token;
+    }
+    // đưa object vào array chứa data cũ
+    a_e.push(e);
+    data.edit = a_e;
     if (data[0]) {
         data[0].status = status;
         await data[0].save();
@@ -141,29 +157,84 @@ module.exports.changeMany = async (req, res) => {
     switch (option) {
         case "active":
             for (let i = 0; i < ids.length; i++) {
+                var data = await modelP.find(condition);
+                //Tạo array chứa data cũ
+                var a_e = [];
+                if (data[0].edit) {
+                    a_e = data[0].edit;
+                }
+                else {
+                    a_e = [];
+                }
+                var e = {};
+                e.edit_at = Date.now();
+                if (res.locals.user) {
+                    e.edit_by = res.locals.user.token;
+                }
+                a_e.push(e);
                 // Cập nhật cần có $set nha
-                await modelP.updateOne({ _id: ids[i] }, { $set: { status: "active" } });
+                await modelP.updateOne({ _id: ids[i] }, { $set: { status: "active", edit: a_e } });
             }
             break;
         case "inactive":
             for (let i = 0; i < ids.length; i++) {
+                var data = await modelP.find(condition);
+                //Tạo array chứa data cũ
+                var a_e = [];
+                if (data[0].edit) {
+                    a_e = data[0].edit;
+                }
+                else {
+                    a_e = [];
+                }
+                var e = {};
+                e.edit_at = Date.now();
+                if (res.locals.user) {
+                    e.edit_by = res.locals.user.token;
+                }
+                a_e.push(e);
                 // Cập nhật cần có $set nha
-                await modelP.updateOne({ _id: ids[i] }, { $set: { status: "inactive" } });
+                await modelP.updateOne({ _id: ids[i] }, { $set: { status: "inactive", edit: a_e } });
             }
             break;
         case "delete":
             for (let i = 0; i < ids.length; i++) {
+                var de = {};
+                de.delete_at = Date.now();
+                if (res.locals.user) {
+                    de.delete_by = res.locals.user.token;
+                }
                 await modelP.updateOne(
                     { _id: ids[i] },
-                    { $set: { deleted: true } });
+                    {
+                        $set: {
+                            deleted: true,
+                            delete: de
+                        }
+                    });
             }
             break;
         case "position":
             for (let i = 0; i < ids.length; i++) {
+                var data = await modelP.find(condition);
+                //Tạo array chứa data cũ
+                var a_e = [];
+                if (data[0].edit) {
+                    a_e = data[0].edit;
+                }
+                else {
+                    a_e = [];
+                }
+                var e = {};
+                e.edit_at = Date.now();
+                if (res.locals.user) {
+                    e.edit_by = res.locals.user.token;
+                }
+                a_e.push(e);
                 var a = ids[i].split('-');
                 await modelP.updateOne(
                     { _id: a[0] },
-                    { $set: { position: a[1] } });
+                    { $set: { position: a[1], edit: a_e } });
             }
     }
     res.redirect('/admin/product');
@@ -187,6 +258,11 @@ module.exports.delete_p = async (req, res) => {
     condition._id = id_r; // Chú ý dùng _id là string còn id là object
     change = {};
     change.deleted = true;
+    change.delete = {};
+    change.delete.delete_at = Date.now();
+    if (res.locals.user) {
+        change.delete.delete_by = res.locals.user.token;
+    }
     try {
         await modelP.updateOne(condition, { $set: change });
     } catch (error) {
@@ -229,9 +305,9 @@ module.exports.GrabagePATCH2 = async (req, res) => {
 }
 
 module.exports.addProduct = async (req, res) => {
-    var condition= {};
+    var condition = {};
     var data = await typeModel.find(condition);
-    res.render('server/pages/product/add.pug',{
+    res.render('server/pages/product/add.pug', {
         dType: data
     });
 };
@@ -245,6 +321,12 @@ module.exports.addProductPost = (req, res) => {
             //  giống với các key của schema
             //--> không cần tạo object thông tin nữa mà dùng luôn cái này làm object thông tin
             data.thumbnail = result.url;
+            data.create = {};
+            // Time tạo ra là mặc định --> không cần đưa create_at vào
+            if (res.locals.user) {
+                data.create.create_by = res.locals.user.token;
+            }
+            console.log(data);
             var product = new modelP(data);
             await product.save();
             res.redirect('/admin/product');
@@ -253,7 +335,7 @@ module.exports.addProductPost = (req, res) => {
 
 module.exports.detailProduct = async (req, res) => {
     var id = req.params.id;
-    var data = await modelP.find({ _id: id });
+    var data = await modelP.find({ _id: id }).lean();
     res.render('server/pages/product/detail.pug', {
         data: data[0]
     });
@@ -278,7 +360,31 @@ module.exports.editProductPatch = async (req, res) => {
             .then(async (result) => {
                 var id = req.params.id;
                 var data = req.body;
+                if(data.outstanding == "true"){
+                    data.outstanding = true;
+                }
+                else{
+                    data.outstanding = false;
+                }
                 data.thumbnail = result.url;
+                var dataOld= await modelP.find({deleted: false, _id: id});
+                //Tạo array chứa data cũ
+                var a_e = [];
+                if (dataOld[0].edit) {
+                    a_e = dataOld[0].edit;
+                }
+                else {
+                    a_e = [];
+                }
+                // tạo object
+                var e = {};
+                e.edit_at = Date.now();
+                if (res.locals.user) {
+                    e.edit_by = res.locals.user.token;
+                }
+                // data.edit là 1 array đưa object vào
+                a_e.push(e);
+                data.edit = a_e;
                 await modelP.updateOne({ _id: id }, data);
                 res.redirect('/admin/product');
             });
@@ -286,8 +392,32 @@ module.exports.editProductPatch = async (req, res) => {
     else { // nếu không có file ảnh mới thì cập nhật cho bằng file cũ tương đương không cập nhật
         var id = req.params.id;
         var data = req.body;
+        if(data.outstanding == "true"){
+            data.outstanding = true;
+        }
+        else{
+            data.outstanding = false;
+        }
         var record = await modelP.find({ _id: id });
         data.thumbnail = record[0].thumbnail;
+        var dataOld= await modelP.find({deleted: false, _id: id});
+        //Tạo array chứa data cũ
+        var a_e = [];
+        if (dataOld[0].edit) {
+            a_e = dataOld[0].edit;
+        }
+        else {
+            a_e = [];
+        }
+        // tạo object
+        var e = {};
+        e.edit_at = Date.now();
+        if (res.locals.user) {
+            e.edit_by = res.locals.user.token;
+        }
+        // data.edit là 1 array đưa object vào
+        a_e.push(e);
+        data.edit = a_e;
         await modelP.updateOne({ _id: id }, data);
         res.redirect('/admin/product');
     }

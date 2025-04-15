@@ -1,2 +1,17 @@
 ﻿//- header.pug 
-div(class='h-1/6 w-screen bg-lime-300 head')
+div(class='h-1/6 w-screen bg-lime-300 head flex justify-between items-center')
+    div
+    div
+    div
+    div 
+    div
+    div 
+    div
+    div
+    div
+    div
+        //- có thêm div để đẩy được các phần tử về bên phải
+    a(class='mr-4 px-4 py-2 bg-blue-500 text-white rounded' href="/admin/auth/login") Đăng nhập
+    a(class='mr-4 px-4 py-2 bg-blue-500 text-white rounded' href="/admin/auth/logOut") Đăng xuất
+//-flex justify-between items-center: Sử dụng Flexbox để căn chỉnh các phần tử bên trong div. justify-between
+//- sẽ đẩy các phần tử sang hai đầu (trái và phải).

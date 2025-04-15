@@ -1,11 +1,28 @@
 //- pages/home/index.js
 extend ../../layout/layout1.pug
 
-block main_1 
-    p this is home page
-    //- img(src="D:/EKR22/public/img/server/anh-nen-4k-anime-1.jpg", alt="none") Sai
-    //- img(src="/public/img/server/anh-nen-4k-anime-1.jpg", alt="none") Sai
-    img(src="/img/server/anh-nen-4k-anime-1.jpg", alt="none")
-    //- img(src="http://localhost:3000/home/img/server/anh-nen-4k-anime-1.jpg", alt="none") sai
-    img(src="http://localhost:3000/img/server/anh-nen-4k-anime-1.jpg", alt="none")
-    img(src="img/server/anh-nen-4k-anime-1.jpg", alt="none")
+block main_1
+    h2= "Outstanding Products"
+    div(class='grid grid-cols-4 gap-4') 
+        -for(var i = 0; i<dataOutstanding.length; i++){
+            div(class='border-8 border-lime-400 mr-2 ml-2')
+                a(href="/product/detail/"+dataOutstanding[i].id) 
+                    img(src=dataOutstanding[i].thumbnail, alt="")
+                h3(class='font-normal hover:font-bold')= dataOutstanding[i].title
+                p= dataOutstanding[i].price
+                -var newPrice = dataOutstanding[i].price - dataOutstanding[i].price * dataOutstanding[i].discountPercentage/100
+                p= newPrice
+        -}
+    br
+    br
+    h2= "New product"
+    div(class='grid grid-cols-4 gap-4') 
+        -for(var i = 0; i<datanew.length; i++){
+            div(class='border-8 border-lime-400 mr-2 ml-2')
+                a(href="/product/detail/"+datanew[i].id)
+                    img(src=datanew[i].thumbnail, alt="")
+                h3(class='font-normal hover:font-bold')= datanew[i].title
+                p= datanew[i].price
+                -var newPrice = datanew[i].price - datanew[i].price * datanew[i].discountPercentage/100
+                p= newPrice
+        -}

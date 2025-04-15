@@ -1,0 +1,23 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Document
+    body 
+        -if(messages.error){
+                div(class='error bg-red-500 text-white text-center' id='error')= messages.error
+        -}
+        h1 Login
+        form(action="/admin/auth/login", method="POST")
+            input(type="email", name="email", placeholder="email")
+            input(type="password", name="password", placeholder="Password")
+            button(type="submit") Login
+        script.
+            // Xóa thông báo nếu có sau 3s
+            var error = document.getElementById('error');
+            if(error){
+                setTimeout(()=>{
+                    error.style.display = 'none';
+                }, 3000);
+            }

@@ -1,69 +1,89 @@
 ﻿//- edit.pug
 extend ../../layout/layout.pug
 block main-content
-    div(class='main w-5/6 bg-orange-100')
-        -var m = data.Thuoc_danh_muc
-        -console.log("m=" + m)
-        form(action="/admin/product/edit/" + data._id +"?_method=PATCH", method="post", enctype="multipart/form-data") 
-            input(type="text", name="title", value=data.title)
-            br
-            br
-            textarea(name="description" )= data.description
-            br
-            br
-            input(type="number", name="price", value=data.price)
-            br
-            br
-            input(type="number", name="discountPercentage", value=data.discountPercentage)
-            br
-            br
-            input(type="number", name="stock", value=data.stock)
-            br
-            br
-            label(for="Thumbnail") Thumbnail
-            input(type="file", name="thumbnail" id="Thumbnail")
-            div(id='preview')
-            h3= "Ảnh cũ"
-            img(src= data.thumbnail , alt="", id='tem')
-            br
-            br
-            input(type="number", name="position", value = data.position)
-            br
-            br
-            if(data.status === 'active')
-                label(for="active") Active
-                input(type="radio", name="status", value="active" id="active" checked)
-                label(for="inactive") Inactive
-                input(type="radio", name="status", value="inactive" id="inactive")
-            else
-                label(for="active") Active
-                input(type="radio", name="status", value="active" id="active")
-                label(for="inactive") Inactive
-                input(type="radio", name="status", value="inactive" id="inactive" checked)
-            br
-            br
-            - var print_node_and_search = (symbo, cur_node)=>{
-                if(cur_node._id == data.Thuoc_danh_muc)
-                    option(value=cur_node._id, selected)= symbo + cur_node.name
-                else 
-                    option(value=cur_node._id)= symbo + cur_node.name
-                //- search child of curr_node
-                -for(var i = 0; i < dataT.length; i++){
-                    //- Duyệt từ đầu nếu gặp node có parent_id = id node hiện tại
-                    -if(cur_node._id == dataT[i].parent_id){
-                        //- Thì in node đó ra và search tiếp con của node đó
-                        -print_node_and_search(symbo + '*', dataT[i])
+    -if(role.permission.includes("SP")){
+        div(class='main w-5/6 bg-orange-100')
+            -var m = data.Thuoc_danh_muc
+            -console.log("m=" + m)
+            form(action="/admin/product/edit/" + data._id +"?_method=PATCH", method="post", enctype="multipart/form-data") 
+                input(type="text", name="title", value=data.title)
+                br
+                br
+                textarea(name="description" )= data.description
+                br
+                br
+                input(type="number", name="price", value=data.price)
+                br
+                br
+                input(type="number", name="discountPercentage", value=data.discountPercentage)
+                br
+                br
+                input(type="number", name="stock", value=data.stock)
+                br
+                br
+                label(for="Thumbnail") Thumbnail
+                input(type="file", name="thumbnail" id="Thumbnail")
+                div(id='preview')
+                h3= "Ảnh cũ"
+                img(src= data.thumbnail , alt="", id='tem')
+                br
+                br
+                input(type="number", name="position", value = data.position)
+                br
+                br
+                if(data.status === 'active')
+                    label(for="active") Active
+                    input(type="radio", name="status", value="active" id="active" checked)
+                    label(for="inactive") Inactive
+                    input(type="radio", name="status", value="inactive" id="inactive")
+                else
+                    label(for="active") Active
+                    input(type="radio", name="status", value="active" id="active")
+                    label(for="inactive") Inactive
+                    input(type="radio", name="status", value="inactive" id="inactive" checked)
+                br
+                br
+                if(data.outstanding === true)
+                    label(for="outstanding") Nổi bật
+                    input(type="radio", name="outstanding", value="true" id="outstanding" checked)
+                    label(for="no_outstanding") Inactive
+                    input(type="radio", name="outstanding", value="false" id="no_outstanding")
+                else
+                    label(for="outstanding") Nổi bật
+                    input(type="radio", name="outstanding", value="true" id="outstanding")
+                    label(for="no_outstanding") Inactive
+                    input(type="radio", name="outstanding", value="false" id="no_outstanding" checked)
+                br
+                br
+                - var print_node_and_search = (symbo, cur_node)=>{
+                    if(cur_node._id == data.Thuoc_danh_muc)
+                        option(value=cur_node._id, selected)= symbo + cur_node.name
+                    else 
+                        option(value=cur_node._id)= symbo + cur_node.name
+                    //- search child of curr_node
+                    -for(var i = 0; i < dataT.length; i++){
+                        //- Duyệt từ đầu nếu gặp node có parent_id = id node hiện tại
+                        -if(cur_node._id == dataT[i].parent_id){
+                            //- Thì in node đó ra và search tiếp con của node đó
+                            -print_node_and_search(symbo + '*', dataT[i])
+                        -}
                     -}
                 -}
-            -}
-            select(name="Thuoc_danh_muc")
-                option(value="" hidden)= "Chọn Thuoc_danh_muc"
-                -for(var i = 0; i< dataT.length; i++){
-                    -if(dataT[i].parent_id == "root"){
-                        -print_node_and_search('*', dataT[i]);
+                select(name="Thuoc_danh_muc")
+                    option(value="" hidden)= "Chọn Thuoc_danh_muc"
+                    -for(var i = 0; i< dataT.length; i++){
+                        -if(dataT[i].parent_id == "root"){
+                            -print_node_and_search('*', dataT[i]);
+                        -}
                     -}
+                br
+                br
+                -if(role.permission.includes("SP")){
+                    input(type="submit", value="edit Product" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded")
                 -}
-            br
-            br
-            input(type="submit", value="edit Product" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded")
-    script(src="/js/server/preview.js")
+        script(src="/js/server/preview.js")
+    -}
+    -else{
+        div(class='main w-5/6 bg-orange-100')
+            h1= "Bạn không có quyền truy cập"
+    -}

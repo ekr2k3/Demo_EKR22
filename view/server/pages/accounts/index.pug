@@ -1,0 +1,26 @@
+//- [roles]/index.pug
+extend ../../layout/layout.pug
+block main-content
+    div(class='main w-5/6 bg-orange-100')
+        a(href="/admin/accounts/create" class = 'border-2 border-emerald-500 ml-16')= '+ New account'
+
+        div(class = 'h-5/6 w-11/12 bg-orange-200 mx-auto')
+            table 
+                thead 
+                    tr 
+                        th= 'STT'
+                        th= 'Tên tài khoản'
+                        th= 'Ảnh'
+                        th= 'action'
+                tbody
+                    -for(var i = 0; i< dataAcc.length ; i++){
+                        tr(class='border-4 border-emerald-500')
+                            td= i
+                            td= dataAcc[i].fullname
+                            td 
+                                img(src=`${dataAcc[i].avata}`, alt='image', class='w-20 h-20')
+                            td 
+                                a(href=`/admin/accounts/edit/${dataAcc[i]._id}`)= 'Edit'
+                                a(href=`/admin/accounts/delete/${dataAcc[i]._id}`)= 'Delete'
+                                a(href=`/admin/accounts/detail/${dataAcc[i]._id}`)= 'Detail'
+                    -}

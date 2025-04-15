@@ -3,10 +3,16 @@ extend ../../layout/layout.pug
 block main-content
     div(class='main w-5/6 bg-orange-100')
         p= data.title
-        img(src = data.thumbnail)
+        img(src = data.thumbnail alt="Image" class="w-1/4 h-1/4")
         p!= data.description
         p= data.price
         p= data.discountPercentage
         p= data.stock
         p= data.position
         p= data.status
+        -if(data.create){
+            if(data.create.create_by)
+                p= "Người cấp nhật: " + data.create.create_by
+            if(data.create.create_at)
+                p= "Giờ cấp nhật: " + moment(data.create.create_at).format("DD/MM/YYYY HH:mm:ss")
+        -}

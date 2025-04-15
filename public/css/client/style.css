@@ -1,0 +1,53 @@
+/* Phần tử cha chứa menu con */
+.submenu {
+    position: relative;
+    z-index: 999; /* Đảm bảo hiển thị nổi phía trên */
+  }
+  
+  /* Menu cấp 1 (ẩn khi chưa hover) */
+  .submenu > ul {
+    position: absolute;
+    top: 100%; /* Hiển thị ngay bên dưới thẻ cha */
+    left: 0;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    background: wheat; /* Màu nền */
+    display: none; /* Mặc định ẩn */
+    min-width: 180px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Đổ bóng nhẹ */
+  }
+  
+  /* Hiển thị menu cấp 1 khi hover */
+  .submenu:hover > ul {
+    display: block;
+  }
+  
+  /* Các item bên trong menu */
+  .submenu ul li {
+    position: relative; /* Cho phép chứa menu con bên trong */
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    white-space: nowrap; /* Ngăn nội dung xuống dòng */
+  }
+  
+  /* Menu cấp 2 trở đi - hiển thị sang trái */
+  .submenu ul li > ul {
+    position: absolute;
+    top: 0;
+    right: 100%; /* Đẩy menu con sang trái */
+    left: auto;  /* Vô hiệu hóa left nếu đã dùng right */
+    display: none;
+    background: wheat;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    min-width: 180px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Đổ bóng */
+  }
+  
+  /* Hiển thị menu con khi hover */
+  .submenu ul li:hover > ul {
+    display: block;
+  }
+  

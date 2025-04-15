@@ -39,6 +39,8 @@ app.get('/', (req, res) => {
 app.get('/env', (req, res) => {
     res.send(process.env.api_key);
 });
+var moment = require('moment');
+app.locals.moment = moment; // cho phép sử dụng trong toàn pug
 app.listen(3000, () => {
     console.log('run at 3000');
     console.log('at index.js-' + process.env.A + process.env.B);

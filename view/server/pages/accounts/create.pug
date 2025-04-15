@@ -1,0 +1,52 @@
+//- create.pug [accounts]
+extend ../../layout/layout.pug
+block main-content
+    div(class='main w-5/6 bg-orange-100')
+        -if(messages.error){
+                div(class='error bg-red-500 text-white text-center' id='error')= messages.error
+        -}
+        form(action="/admin/accounts/create", method="post", enctype="multipart/form-data") 
+            input(type="text", name="fullname", placeholder="fullname")
+            br
+            br
+            input(type="email", name="email" placeholder="email")
+            br
+            br
+            input(type="password", name="password" placeholder="password")
+            br
+            br
+            input(type="input", name="phone", placeholder="phon_number")
+            br
+            br
+            select(name="role_id")
+                option(value="" hidden)= "Select Role"
+                -for(let role of dataRole)
+                    option(value=role.id)= role.title
+            br
+            br
+            label(for="active") Active
+            input(type="radio", name="status", value="active" id="active")
+            label(for="inactive") Inactive
+            input(type="radio", name="status", value="inactive" id="inactive")
+            br
+            br
+            input(type="file", name="avata")
+            div(id='preview')
+            br
+            br
+            input(type="submit", value="Add Account" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded")
+    script.
+        var inputFile = document.querySelector('input[name="avata"]');
+        var img = document.createElement('img');
+        inputFile.onchange = (event)=>{
+            var file = event.target.files[0];
+            var url = URL.createObjectURL(file);
+            img.setAttribute('src', url);
+            var preview = document.getElementById('preview');
+            preview.setAttribute('style', 'width:20vw');
+            preview.appendChild(img);
+        }
+        var error = document.getElementById('error');
+        setTimeout(()=>{
+            error.style.display = 'none';
+        }, 3000);

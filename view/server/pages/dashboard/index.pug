@@ -1,2 +1,11 @@
 ﻿//- index.pug[dashboard] 
 extend ../../layout/layout.pug
+block main-content
+    div(class='main w-5/6 bg-orange-100')
+        div= user
+        p= '--------------------------------------------'
+        div= role
+        p= '--------------------------------------------'
+        div= role.title 
+        p= '--------------------------------------------'
+        div= role.permission

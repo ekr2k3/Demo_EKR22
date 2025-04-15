@@ -1,7 +1,7 @@
 ﻿//position.js
 var inputAll = document.querySelectorAll('.position');
 var buttonx = document.querySelector('#option button');
-buttonx.onclick = (e) => {
+buttonx.addEventListener("click", (e) => {
     e.preventDefault();
     // Lấy các checkbox trên trang hiện tại
     var checkboxs = document.querySelectorAll('.choice');
@@ -49,7 +49,7 @@ buttonx.onclick = (e) => {
         form.setAttribute('action', url)
         form.submit();
     }
-};
+});
 
 
 

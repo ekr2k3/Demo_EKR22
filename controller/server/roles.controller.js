@@ -23,8 +23,9 @@ module.exports.roleCreatePost = async (req, res) => {
 
 module.exports.roleEditGet = async (req, res) => {
     var id = req.query.id;
+    console.log(id);
     var role = await Roles_model.findOne({
-        id: id
+        _id: id
     });
     console.log(role);
     res.render('./server/pages/roles/edit.pug', {
@@ -35,7 +36,7 @@ module.exports.roleEditGet = async (req, res) => {
 module.exports.roleEditPatch = async (req, res) => {
     var id = req.query.id;
     await Roles_model.updateOne({
-        id: id
+        _id: id
     }, req.body);
     res.redirect('/admin/role');
 }

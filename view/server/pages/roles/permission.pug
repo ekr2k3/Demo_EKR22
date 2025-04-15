@@ -25,6 +25,12 @@ block main-content
                     -for (let i = 0; i < roles.length; i++)
                         td
                             input(type='checkbox' x=roles[i]._id y="XP")
+                //- Quyền 3 cho body 1
+                tr 
+                    td= "sửa"
+                    -for (let i = 0; i < roles.length; i++)
+                        td
+                            input(type='checkbox' x=roles[i]._id y="SP")
             //- Body 2
             tbody
                 //- Tên body 2

@@ -1,8 +1,7 @@
 ﻿//Change Many
 var button = document.querySelector('#option button');
-button.onclick = (e) => {
+button.addEventListener("click", (e) => {
     e.preventDefault();
-    
     // Lấy các checkbox trên trang hiện tại
     var checkboxs = document.querySelectorAll('.choice');
     
@@ -36,10 +35,10 @@ button.onclick = (e) => {
     } else {
         // Gửi biểu mẫu
         var url = '/admin/product' + '?_method=PATCH';
-        form.setAttribute('action',url)
+        form.setAttribute('action',url);
         form.submit();
     }
-};
+});
 
 var all = document.querySelector('[name = "all"]');
 all.onclick= ()=>{
