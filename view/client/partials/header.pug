@@ -1,7 +1,7 @@
 ﻿//- header.pug
 - var x = (cur_node) => {
   li 
-    a(href="/product/" + cur_node._id)  #{cur_node.name}
+    a(href="/product/sub/" + cur_node._id)  #{cur_node.name}
     - var childNodes = []
     - for (var i = 0; i < data.length; i++) {
       - if (data[i].parent_id == cur_node._id) {
@@ -21,6 +21,11 @@
     a.d-flex.align-items-center.mb-3.mb-md-0.me-md-auto.link-body-emphasis.text-decoration-none(href='/home')
       img(src="/img/server/ABC.jpg" alt="None" width='40' height='32')
       span.fs-4 Simple header
+    
+    form(action="/product/search", method="get", id="search_form", class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3")
+      input(type="text" name="search" class="form-control me-2" placeholder="Tìm kiếm sản phẩm" aria-label="Search")
+      button.btn.btn-outline-success(type="submit" id="search_btn") Tìm kiếm
+    
     ul.nav.nav-pills
       li.nav-item
         a.nav-link.active(href='/home' aria-current='page') Home

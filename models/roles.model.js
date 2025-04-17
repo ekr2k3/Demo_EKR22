@@ -12,6 +12,6 @@ ob =   {
         default: false
     }
   };
-var schema = mongoose.Schema; // trỏ tới constructor schema
-var schemeRole = new schema(ob)
+var sChema = mongoose.Schema; // trỏ tới constructor schema
+var schemeRole = new sChema(ob)
 module.exports = mongoose.model('roles', schemeRole);

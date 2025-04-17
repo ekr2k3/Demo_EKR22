@@ -1,0 +1,16 @@
+//- [search client]
+
+extend ../../layout/layout1.pug
+
+block main_1
+    h1= title
+    div(class='grid grid-cols-4 gap-4') 
+        -for(var i = 0; i<toPug.length; i++){
+            div(class='border-8 border-lime-400 mr-2 ml-2')
+                a(href="/product/detail/"+toPug[i].id)    
+                    img(src=toPug[i].thumbnail, alt="")
+                h3(class='font-normal hover:font-bold')= toPug[i].title
+                p= toPug[i].price
+                -var newPrice = toPug[i].price - toPug[i].price * toPug[i].discountPercentage/100
+                p= newPrice
+        -}

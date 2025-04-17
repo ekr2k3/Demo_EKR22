@@ -2,5 +2,46 @@
 extend ../../layout/layout1.pug
 
 block main_1
-    h1= title
-    p= toPug
+    h1.text-2xl.font-bold.mb-4= title
+
+    div(class="flex flex-col md:flex-row gap-8 p-4")
+        //- Hình ảnh sản phẩm
+        img(src=toPug.thumbnail, alt="Image", class="w-full md:w-1/3 h-auto object-cover rounded shadow-md")
+
+        //- Thông tin chi tiết
+        .flex-1.space-y-2
+            h2.text-xl.font-semibold.text-gray-800= toPug.title
+            p.text-gray-600!= toPug.description
+
+            .text-lg.text-red-500.font-bold Giá: #{toPug.price} ₫
+            - var newPrice = toPug.price - toPug.price * toPug.discountPercentage / 100
+            .text-lg.text-green-600.font-bold Giá sau giảm: #{newPrice.toFixed(0)} ₫
+            
+            p.text-sm.text-gray-500 Giảm giá: #{toPug.discountPercentage}%
+            p.text-sm.text-gray-500 Tồn kho: #{toPug.stock}
+            p.text-sm.text-gray-500 Vị trí: #{toPug.position}
+            p.text-sm.text-gray-500 Trạng thái: #{toPug.status}
+
+            - if (toPug.create) {
+                if (toPug.create.create_by)
+                    p.text-sm.text-gray-400 Cập nhật bởi: #{toPug.create.create_by}
+                if (toPug.create.create_at)
+                    p.text-sm.text-gray-400 Cập nhật lúc: #{moment(toPug.create.create_at).format("DD/MM/YYYY HH:mm:ss")}
+            - }
+
+            //- Form thêm vào giỏ hàng
+            form(action="/cart/add/" + toPug._id, method="POST", class="flex items-center gap-4 mt-4")
+                input(
+                    type="number" 
+                    name="quantity" 
+                    value=1 
+                    min="1" 
+                    max=toPug.stock 
+                    class="w-20 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-lime-400"
+                )
+                button(
+                    type="submit" 
+                    class="bg-lime-500 hover:bg-lime-600 text-white font-semibold px-4 py-2 rounded-md transition duration-200"
+                ) 
+                    i(class="fas fa-cart-plus mr-2")
+                    | Thêm vào giỏ

@@ -7,12 +7,16 @@ var routerTypeServer = require('./server/type.router.js');
 var routerRolesServer = require('./server/roles.router.js');
 var routerAccountServer = require('./server/accounts.router.js');
 var routerAuth = require('./server/auth.router.js');
+var routerCartClient = require('./client/cart/cart.router.js');
 var middlewareAuth = require('../validation/server/auth.validation.middleware.js')
 
 var middlewareGetAllType = require('../middleware/dataDanhMuc.js');
 console.log('at sumaryRouter.js-'+process.env.A + process.env.B);
 var prefix = '/admin';
+
+var middlewareCart = require('../middleware/cart.middleware.js');
 module.exports = (app)=>{
+    app.use('/',middlewareCart); 
     app.locals.PREFIX_SERVER = prefix;
     app.use('/home', middlewareGetAllType.getAllType, routerHome);
     app.use('/product', middlewareGetAllType.getAllType, routerProduct);
@@ -22,4 +26,5 @@ module.exports = (app)=>{
     app.use(prefix + '/role', middlewareAuth.checkLogin, routerRolesServer);
     app.use(prefix + '/accounts', middlewareAuth.checkLogin, routerAccountServer);
     app.use(prefix + '/auth', routerAuth);
+    app.use('/cart', routerCartClient);
 }

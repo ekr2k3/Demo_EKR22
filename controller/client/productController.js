@@ -62,6 +62,19 @@ module.exports.productDetailGet = async (req, res) => {
     console.log(DATA); // Kiểm tra thử bằng các in ra
     res.render('client/pages/product/detail.pug', {
         title: 'Detail',
+        toPug: DATA[0]
+    });
+}
+
+module.exports.productSearchGet = async (req, res) => {
+    var search = req.query.search; // Lấy giá trị từ query string
+    console.log(search); // Kiểm tra thử bằng các in ra
+    // Biểu thức chính quy
+    var condition = { title: { $regex: search, $options: 'i' } }; // Tìm kiếm không phân biệt chữ hoa chữ thường
+    var DATA = await modelPhone.find(condition);
+    console.log(DATA); // Kiểm tra thử bằng các in ra
+    res.render('client/pages/product/search.pug', {
+        title: 'Search',
         toPug: DATA
     });
 }
