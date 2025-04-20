@@ -12,6 +12,8 @@ module.exports.homeGet = async (req,res)=>{
     }
     var datanew = await modelPhone.find(condition2).sort({ createdAt: -1 }).limit(4);
     //-1 là giảm; 1 là tăng
+
+    console.log("controller " + res.locals.totalQuantity);
     res.render('client/pages/home/index.pug',{
         dataOutstanding: dataOutstanding,
         datanew: datanew

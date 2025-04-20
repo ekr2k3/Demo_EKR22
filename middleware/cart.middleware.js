@@ -19,7 +19,15 @@ module.exports = async function (req, res, next) {
         next(); // gọi next() để tiếp tục xử lý request
     }
     else{
-        // nếu có thì gọi next() để tiếp tục xử lý request
+        // Lấy danh sách sản phẩm trong giỏ hàng từ db (tức arr poducts)
+        // ở mỗi element cộng dồn quantity lại với nhau
+        var cart = await modelCart.findById(req.cookies.cart_id); // tìm giỏ hàng theo id
+        var arr_product = cart.products; // lấy mảng sản phẩm trong giỏ hàng
+        var totalQuantity = 0; // biến tổng số lượng sản phẩm trong giỏ hàng
+        for (var i = 0; i < arr_product.length; i++) {
+            totalQuantity += Number(arr_product[i].quantity); // cộng dồn số lượng sản phẩm
+        }
+        res.locals.totalQuantity = totalQuantity; // lưu tổng số lượng sản phẩm vào res.locals để sử dụng trong view
         next();
     }
 }

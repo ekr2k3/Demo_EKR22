@@ -1,0 +1,44 @@
+//- index.pug [cart] / client
+
+extends ../../layout/layout1.pug
+
+block main_1
+  h2 Giỏ hàng
+    -var total = 0;
+  //- Bảng hiển thị sản phẩm trong giỏ hàng
+  table.table-auto.w-full.border-collapse.border.border-slate-400
+    thead
+      tr
+        th.border.border-slate-300 STT
+        th.border.border-slate-300 Ảnh sản phẩm
+        th.border.border-slate-300 Tên sản phẩm
+        th.border.border-slate-300 Số lượng
+        th.border.border-slate-300 Giá tiền
+        th.border.border-slate-300 Tổng tiền
+        th.border.border-slate-300 Hành động
+
+    tbody
+      each product, i in cart_have
+        tr
+          td.border.border-slate-300.text-center= i + 1
+          td.border.border-slate-300.text-center
+            img.w-20.h-20(src=product.thumbnail, alt="")
+          td.border.border-slate-300.text-center= product.name
+          td.border.border-slate-300.text-center
+            input.w-16(type="number", value=product.quantity, min="1", class="cart-quantity", id_product=product.id)
+          td.border.border-slate-300.text-center
+            | #{(product.price).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+          td.border.border-slate-300.text-center
+            | #{(product.price * product.quantity).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+            - total += product.price * product.quantity
+          td.border.border-slate-300.text-center
+            a(href=`/cart/delete/${product.id}`) Xóa sản phẩm
+
+  //- Thành tiền + nút thanh toán
+  .flex.justify-between.mt-4
+    div
+      h3.text-lg.font-bold Thành tiền: #{total.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+    a(href="/cart/checkout", class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded") Thanh toán
+
+  script(src="/js/client/updateCart.js")
+

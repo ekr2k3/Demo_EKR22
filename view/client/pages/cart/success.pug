@@ -1,0 +1,48 @@
+extends ../../layout/layout1.pug
+
+block main_1
+  .max-w-5xl.mx-auto.bg-white.shadow-md.rounded-xl.p-6
+    h2.text-3xl.font-bold.text-green-600.mb-6.text-center Chúc mừng, bạn đã thanh toán thành công!
+
+    h3.text-xl.font-semibold.text-gray-800.mb-3 Thông tin khách hàng:
+    table.table-auto.w-full.border-collapse.border.border-slate-400.mb-8.rounded-lg.overflow-hidden
+      thead.bg-gray-100
+        tr
+          th.border.border-slate-300.text-left.p-3 Tên khách hàng
+          th.border.border-slate-300.text-left.p-3 Số điện thoại
+          th.border.border-slate-300.text-left.p-3 Địa chỉ
+      tbody
+        tr
+          td.border.border-slate-300.p-3= dataCheckOut.name
+          td.border.border-slate-300.p-3= dataCheckOut.phone
+          td.border.border-slate-300.p-3= dataCheckOut.address
+
+    h3.text-xl.font-semibold.text-gray-800.mb-3 Sản phẩm đã đặt:
+    table.table-auto.w-full.border-collapse.border.border-slate-400.mb-6.rounded-lg.overflow-hidden
+      thead.bg-gray-100
+        tr
+          th.border.border-slate-300.p-3 STT
+          th.border.border-slate-300.p-3 Ảnh sản phẩm
+          th.border.border-slate-300.p-3 Tên sản phẩm
+          th.border.border-slate-300.p-3 Số lượng
+          th.border.border-slate-300.p-3 Giá tiền
+          th.border.border-slate-300.p-3 Tổng tiền
+
+      tbody
+        - var total = 0;
+        each product, i in dataProductCheckOut
+          tr
+            td.border.border-slate-300.text-center.p-3= i + 1
+            td.border.border-slate-300.text-center.p-3
+              img.w-20.h-20.object-cover.mx-auto(src=product.thumbnail, alt="")
+            td.border.border-slate-300.text-center.p-3= product.name
+            td.border.border-slate-300.text-center.p-3= product.quantity
+            td.border.border-slate-300.text-center.p-3
+              | #{(product.price).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+            td.border.border-slate-300.text-center.p-3
+              - var productTotal = product.price * product.quantity;
+              | #{(productTotal).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+              - total += productTotal;
+
+    h3.text-right.text-xl.font-bold.text-blue-600.mt-4
+      | Tổng thanh toán: #{total.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}

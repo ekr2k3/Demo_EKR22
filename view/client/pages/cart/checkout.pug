@@ -1,0 +1,51 @@
+//- [checkout.pug] client
+extends ../../layout/layout1.pug
+
+block main_1
+  h2.text-2xl.font-bold.mb-4 Thanh toán
+
+  - var total = 0;
+
+  //- Bảng hiển thị sản phẩm trong giỏ
+  table.table-auto.w-full.border-collapse.border.border-slate-400.mb-6
+    thead.bg-gray-100
+      tr
+        th.border.border-slate-300.p-2 STT
+        th.border.border-slate-300.p-2 Ảnh sản phẩm
+        th.border.border-slate-300.p-2 Tên sản phẩm
+        th.border.border-slate-300.p-2 Số lượng
+        th.border.border-slate-300.p-2 Giá tiền
+        th.border.border-slate-300.p-2 Tổng tiền
+
+    tbody
+      each product, i in cart_have
+        tr
+          td.border.border-slate-300.text-center.p-2= i + 1
+          td.border.border-slate-300.text-center.p-2
+            img.w-20.h-20.object-cover.mx-auto(src=product.thumbnail, alt="")
+          td.border.border-slate-300.text-center.p-2= product.name
+          td.border.border-slate-300.text-center.p-2= product.quantity
+          td.border.border-slate-300.text-center.p-2 
+            | #{(product.price).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+          td.border.border-slate-300.text-center.p-2 
+            | #{(product.price * product.quantity).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+            - total += product.price * product.quantity
+
+  //- Tổng tiền
+  .text-right.mb-6
+    h3.text-xl.font-bold Thành tiền: 
+      span.text-red-600 #{total.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+
+  //- Form thông tin thanh toán
+  form(method="POST", action="/cart/checkout", class="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-md")
+    h3.text-lg.font-semibold.mb-4 Thông tin thanh toán
+    .mb-4
+      label.block.text-gray-700(for="name") Họ tên:
+      input(type="text", name="name", required=true, class="w-full border border-gray-300 rounded-md p-2 mt-1 focus:outline-none focus:ring focus:border-blue-400")
+    .mb-4
+      label.block.text-gray-700(for="phone") Số điện thoại:
+      input(type="text", name="phone", required=true, class="w-full border border-gray-300 rounded-md p-2 mt-1 focus:outline-none focus:ring focus:border-blue-400")
+    .mb-4
+      label.block.text-gray-700(for="address") Địa chỉ:
+      input(type="text", name="address", required=true, class="w-full border border-gray-300 rounded-md p-2 mt-1 focus:outline-none focus:ring focus:border-blue-400")
+    button(type="submit", class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-2") Xác nhận thanh toán

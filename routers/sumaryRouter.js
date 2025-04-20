@@ -15,11 +15,16 @@ console.log('at sumaryRouter.js-'+process.env.A + process.env.B);
 var prefix = '/admin';
 
 var middlewareCart = require('../middleware/cart.middleware.js');
+
+var routerUser = require('./client/user/user.router.js')
+var middlewareUser = require('../middleware/user.middleware.js');
 module.exports = (app)=>{
+    app.use(middlewareUser);
     app.use('/',middlewareCart); 
     app.locals.PREFIX_SERVER = prefix;
-    app.use('/home', middlewareGetAllType.getAllType, routerHome);
-    app.use('/product', middlewareGetAllType.getAllType, routerProduct);
+    app.use(middlewareGetAllType.getAllType);
+    app.use('/home', routerHome);
+    app.use('/product', routerProduct);
     app.use(prefix + '/dashboard', middlewareAuth.checkLogin, routerDashBoardServer);
     app.use(prefix + '/product', middlewareAuth.checkLogin, routerProductServer);
     app.use(prefix + '/type', middlewareAuth.checkLogin, routerTypeServer);
@@ -27,4 +32,5 @@ module.exports = (app)=>{
     app.use(prefix + '/accounts', middlewareAuth.checkLogin, routerAccountServer);
     app.use(prefix + '/auth', routerAuth);
     app.use('/cart', routerCartClient);
+    app.use('/user', routerUser);
 }
