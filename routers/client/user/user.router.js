@@ -19,4 +19,6 @@ router.get('/password/otp', userController.otpGet);
 router.post('/password/otp', userValidate.otpPost, userController.otpPost);
 router.get('/password/reset', userController.resetGet)
 router.post('/password/reset', userValidate.resetPost, userController.resetPost);
+
+router.get('/info', userController.info);
 module.exports = router;

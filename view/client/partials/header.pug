@@ -1,13 +1,16 @@
-﻿//- header.pug
+﻿//- header [client]
+//- Dropdown đệ quy
 - var x = (cur_node) => {
-  li 
+  li
     a(href="/product/sub/" + cur_node._id)  #{cur_node.name}
+
     - var childNodes = []
     - for (var i = 0; i < data.length; i++) {
       - if (data[i].parent_id == cur_node._id) {
         - childNodes.push(data[i])
       - }
     - }
+
     - if (childNodes.length > 0) {
       ul
         - for (var i = 0; i < childNodes.length; i++) {
@@ -19,16 +22,29 @@
 .container
   header.d-flex.flex-wrap.justify-content-center.py-3.mb-4.border-bottom
     a.d-flex.align-items-center.mb-3.mb-md-0.me-md-auto.link-body-emphasis.text-decoration-none(href='/home')
-      img(src="/img/server/ABC.jpg" alt="None" width='40' height='32')
-      span.fs-4 Simple header
+      img(src=setting.logo alt="Logo" width='40' height='32' class="me-2 rounded")
+      span.fs-4.text-primary.font-bold= setting.websiteName
 
-    form(action="/product/search" method="get" id="search_form" class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3")
-      input(type="text" name="search" class="form-control me-2" placeholder="Tìm kiếm sản phẩm" aria-label="Search")
+    form(
+      action="/product/search",
+      method="get",
+      id="search_form",
+      class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3 d-flex"
+    )
+      input(
+        type="text",
+        name="search",
+        class="form-control me-2 rounded border border-gray-300 shadow-sm focus:outline-none focus:ring focus:ring-blue-200",
+        placeholder="Tìm kiếm sản phẩm",
+        aria-label="Search"
+      )
       button.btn.btn-outline-success(type="submit" id="search_btn") Tìm kiếm
 
-    ul.nav.nav-pills
+    ul.nav.nav-pills.d-flex.gap-2.align-items-center
       li.nav-item
         a.nav-link.active(href='/home' aria-current='page') Home
+
+      //- Menu Sản phẩm
       li.nav-item(class="submenu")
         a(href="/product") Sản phẩm
         ul
@@ -37,19 +53,17 @@
               - x(data[i])
             - }
           - }
+
       li.nav-item
-        a(href="/cart")= `Giỏ hàng (${totalQuantity})`
+        a(href="/cart" class="nav-link")= `Giỏ hàng (${totalQuantity})`
+
       if(user)
-        li.nav-item 
-          a(href="/user/logout")= "Đăng xuất"
-      else 
-        li.nav-item 
-          a(href="/user/register")= "Đăng ký" 
-        li.nav-item 
-          a(href="/user/login")= "Đăng nhập"
-
-
-
-
-
-
+        li.nav-item
+          a(href="/user/info" class="nav-link text-success fw-bold")= user[0].fullname
+        li.nav-item
+          a(href="/user/logout" class="nav-link text-danger") Đăng xuất
+      else
+        li.nav-item
+          a(href="/user/register" class="nav-link text-info") Đăng ký
+        li.nav-item
+          a(href="/user/login" class="nav-link text-primary") Đăng nhập

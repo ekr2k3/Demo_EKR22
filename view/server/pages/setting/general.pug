@@ -1,0 +1,71 @@
+//- genernal.pug [admin]
+
+//- viết đoạn miêu tả sau và đưa vào cho gpt render code
+
+//- Viết giao diện để hiển thị thông tin cho schema sau [Copy đoạn từ schema vào]
+//- var schemaSetting_general = new mongoose.Schema({
+//-     websiteName: String,
+//-     logo: String,
+//-     phone: String,
+//-     address: String,
+//-     nocopyRight: String
+//- });
+
+//- với object được truyên qua là setting (nhớ if else vì có thể setting chưa được khởi tạo or 1 số trường bị thiếu)
+//- kèm 1 nút tới trang /admin/setting/general/edit/(id bản ghi) or /admin/setting/general/create nếu chưa tồn tại
+extend ../../layout/layout.pug
+block main-content
+    div(class='main w-5/6 bg-orange-100')
+        .section(class="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-lg space-y-6")
+            h2.text-3xl.font-bold.text-center.text-blue-800.mb-4 Thông tin cấu hình website
+
+            //- Website Name
+            if setting && setting.websiteName
+                .flex.justify-between.items-center
+                span.font-semibold.text-gray-700 Tên website:
+                span.text-gray-900= setting.websiteName
+            else
+                .text-red-500 Không có thông tin Tên website
+
+            //- Logo
+            if setting && setting.logo
+                .flex.flex-col.items-start
+                span.font-semibold.text-gray-700 Logo:
+                img.mt-2.rounded-md.shadow-md(max-width="200", src=setting.logo, alt="Logo")
+            else
+                .text-red-500 Không có logo hiển thị
+
+            //- Phone
+            if setting && setting.phone
+                .flex.justify-between.items-center
+                span.font-semibold.text-gray-700 Số điện thoại:
+                span.text-gray-900= setting.phone
+            else
+                .text-red-500 Không có thông tin số điện thoại
+
+            //- Address
+            if setting && setting.address
+                .flex.justify-between.items-center
+                span.font-semibold.text-gray-700 Địa chỉ:
+                span.text-gray-900= setting.address
+            else
+                .text-red-500 Không có thông tin địa chỉ
+
+            //- NoCopyright
+            if setting && setting.nocopyRight
+                .flex.justify-between.items-center
+                span.font-semibold.text-gray-700 Bản quyền:
+                span.text-gray-900= setting.nocopyRight
+            else
+                .text-red-500 Không có nội dung bản quyền
+
+            if (setting)
+                //- Button to edit
+                .flex.justify-center.mt-6
+                    a(href="/admin/setting/general/edit/" + setting._id, class="inline-block px-5 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-transform transform hover:scale-105 shadow-md")
+                        | Chỉnh sửa thông tin
+            else
+                //- Button create
+                .flex.justify-center.mt-6
+                    a(href="/admin/setting/general/create", class="inline-block px-5 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-transform transform hover:scale-105 shadow-md")
+                        | Khởi tạo thông tin

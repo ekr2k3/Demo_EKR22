@@ -23,13 +23,13 @@ module.exports.loginPost = async (req, res, next) => {
     var user = await modelUser.find({
         email: req.body.email
     })
-    if(req.body.password == user.password){
+    if(req.body.password != user[0].password){
         req.flash("error", "Mật khẩu không đúng");
         res.redirect("back");
         return;
     }
 
-    if(!user){
+    if(user.length == 0){
         req.flash("error", "Tài khoản không tồn tại");
         res.redirect("back");
         return;

@@ -18,7 +18,10 @@ var middlewareCart = require('../middleware/cart.middleware.js');
 
 var routerUser = require('./client/user/user.router.js')
 var middlewareUser = require('../middleware/user.middleware.js');
+var routerAdminSetting = require('../routers/server/setting.router.js');
+var middlewareSetting = require('../middleware/setting.middleware.js')
 module.exports = (app)=>{
+    app.use(middlewareSetting)
     app.use(middlewareUser);
     app.use('/',middlewareCart); 
     app.locals.PREFIX_SERVER = prefix;
@@ -33,4 +36,8 @@ module.exports = (app)=>{
     app.use(prefix + '/auth', routerAuth);
     app.use('/cart', routerCartClient);
     app.use('/user', routerUser);
+    app.use(prefix + '/setting', middlewareAuth.checkLogin, routerAdminSetting);
+    app.get("*", (req, res)=>{
+        res.render('./404/404.pug')
+    })
 }

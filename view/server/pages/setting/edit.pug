@@ -1,0 +1,84 @@
+//- edit.pug
+
+//- viết đoạn miêu tả sau và đưa vào cho gpt render code
+
+//- Viết các ô để nhập thông tin cho schema sau [Copy đoạn từ schema vào]
+//- var schemaSetting_general = new mongoose.Schema({
+//-     websiteName: String,
+//-     logo: String,
+//-     phone: String,
+//-     address: String,
+//-     nocopyRight: String
+//- });
+
+//- mọi thứ được ở trong 1 form tới /admin/setting/general/edit/:_id [?_method=patch] 
+//- trong đó mọi cái là ô input text 
+//- Còn logo là input file
+
+//- Ngoài ra do là trang sửa --> Sẽ tự điền các giá trị cũ vào trong các ô
+extend ../../layout/layout.pug
+block main-content
+    div(class='main w-5/6 bg-orange-100')
+        .section(class="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-lg")
+            h2.text-3xl.font-bold.text-blue-800.text-center.mb-6 Chỉnh sửa thông tin cấu hình website
+
+            form(action=`/admin/setting/general/edit/${setting._id}?_method=patch`, method="POST", enctype="multipart/form-data", class="space-y-6")
+
+                //- Website Name
+                .flex.flex-col
+                label(for="websiteName", class="font-semibold text-gray-700") Tên Website:
+                input#websiteName(
+                    type="text",
+                    name="websiteName",
+                    value=setting.websiteName,
+                    class="mt-1 p-2 border rounded-lg shadow-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                )
+
+                //- Logo
+                .flex.flex-col
+                label(for="logo", class="font-semibold text-gray-700") Logo:
+                if setting.logo
+                    img(src=setting.logo, alt="Current Logo", class="w-40 mt-2 rounded-md shadow-md")
+                input#logo(
+                    type="file",
+                    name="logo",
+                    accept="image/*",
+                    class="mt-2 p-2 border rounded-lg shadow-sm w-full bg-gray-50"
+                )
+
+                //- Phone
+                .flex.flex-col
+                label(for="phone", class="font-semibold text-gray-700") Số điện thoại:
+                input#phone(
+                    type="text",
+                    name="phone",
+                    value=setting.phone,
+                    class="mt-1 p-2 border rounded-lg shadow-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                )
+
+                //- Address
+                .flex.flex-col
+                label(for="address", class="font-semibold text-gray-700") Địa chỉ:
+                input#address(
+                    type="text",
+                    name="address",
+                    value=setting.address,
+                    class="mt-1 p-2 border rounded-lg shadow-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                )
+
+                //- No Copyright
+                .flex.flex-col
+                label(for="nocopyRight", class="font-semibold text-gray-700") Ghi chú bản quyền:
+                input#nocopyRight(
+                    type="text",
+                    name="nocopyRight",
+                    value=setting.nocopyRight,
+                    class="mt-1 p-2 border rounded-lg shadow-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+                )
+
+                //- Submit Button
+                .flex.justify-center.mt-6
+                button(
+                    type="submit",
+                    class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-md transition-transform transform hover:scale-105"
+                ) Cập nhật

@@ -90,11 +90,21 @@ module.exports.resetGet = (req, res) => {
 module.exports.resetPost = async (req, res) => {
     // Tìm bản ghi user
     var user = await modelUser.find({
-        token_client : req.cookies.token_client
+        token_client: req.cookies.token_client
     }) // trả ra 1 mảng
     console.log(user[0].password);
     // cập nhập lại mật khẩu
     user[0].password = req.body.password;
     await user[0].save();
     res.redirect('/home')
+}
+
+module.exports.info = async (req, res) => {
+    // Tìm bản ghi user
+    var user = await modelUser.find({
+        token_client: req.cookies.token_client
+    }) // trả ra 1 mảng
+    res.render('./client/pages/user/info.pug',{
+        userInfo : user[0]
+    })
 }

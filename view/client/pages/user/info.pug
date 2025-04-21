@@ -1,0 +1,38 @@
+//- info.pug [client]
+
+extends ../../layout/layout1.pug
+
+block main_1
+    div(class='flex justify-center items-center min-h-screen bg-gray-100')
+        div(class='bg-white shadow-xl rounded-2xl p-8 w-full max-w-md transform transition-all duration-500 hover:scale-105 hover:shadow-2xl')
+            h2(class='text-2xl font-bold mb-4 text-gray-800 text-center') User Information
+            ul(class='space-y-4')
+                li(class='flex justify-between items-center')
+                    span(class='font-semibold text-gray-600') ID:
+                    span(class='text-gray-800') #{userInfo._id}
+                
+                li(class='flex justify-between items-center')
+                    span(class='font-semibold text-gray-600') Email:
+                    span(class='text-blue-600') #{userInfo.email}
+                
+                li(class='flex justify-between items-center')
+                    span(class='font-semibold text-gray-600') Password:
+                    span(class='text-gray-500') #{userInfo.password}
+                
+                li(class='flex justify-between items-center')
+                    span(class='font-semibold text-gray-600') Full Name:
+                    span(class='text-gray-800') #{userInfo.fullname}
+                
+                li(class='flex justify-between items-center')
+                    span(class='font-semibold text-gray-600') Status:
+                    span(class=(userInfo.status === 'active' ? 'text-green-600 font-medium' : 'text-red-600 font-medium')) #{userInfo.status}
+                
+                li(class='flex justify-between items-center')
+                    span(class='font-semibold text-gray-600') Deleted:
+                    span(class='text-gray-800') #{userInfo.deleted}
+                
+                li(class='flex justify-between items-center')
+                    span(class='font-semibold text-gray-600') Token:
+                    span(class='text-purple-600 text-xs truncate') #{userInfo.token_client}
+
+
