@@ -15,6 +15,8 @@
     "env": {
         "CLOUD_NAME": "dud8odlyw",
         "API_KEY": "573137813583967",
-        "API_SECRET": "cfG0o8JYP7ThH3HRoXGT5NI6zuA"
+        "API_SECRET": "cfG0o8JYP7ThH3HRoXGT5NI6zuA",
+        "EMAIL_USER": "22a1001d0222@students.hou.edu.vn",
+        "EMAIL_PASS": "pwzd vvdc slbd kkjn"
     }
 }
