@@ -7,6 +7,14 @@ var cookieParser = require('cookie-parser');
 var flash = require('express-flash');
 //Khởi tạo ứng dựng
 var app = ex();
+// Nâng cấp server
+const http = require('http');
+const server = http.createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
+global.ioF = io; // cho phép sử dụng io ở các file khác với tên mới tùy chọn 
+
+
 app.use(cookieParser("anystring")); // Nhập chuỗi bất kỳ
 app.use(session({
     cookie: { maxAge: 60000 }, // cho phép session id tồn tại 1 phút trong cookie
@@ -41,7 +49,7 @@ app.get('/env', (req, res) => {
 });
 var moment = require('moment');
 app.locals.moment = moment; // cho phép sử dụng trong toàn pug
-app.listen(3000, () => {
+server.listen(3000, () => {
     console.log('run at 3000');
     console.log('at index.js-' + process.env.A + process.env.B);
 });

@@ -1,0 +1,105 @@
+//- chat [pug]/index.pug
+
+//- pages/home/index.js
+extend ../../layout/layout1.pug
+
+block main_1
+    if user
+        h2(class="text-2xl font-bold mb-4 text-center") Chat
+
+        //- mô tả các khối
+        //- Có 1 khối chat để hiển thị các tin nhắn
+        //- Tin của mình sẽ có màu xang và ở bên phải
+        //- Tin của người khác sẽ có màu xám và ở bên trái
+        //- có 1 form để gửi tin nhắn
+
+        //- tạm thời chưa có data lên sẽ mô phổng dữ liệu
+
+        //- Container căn giữa khung chat
+        div(class="flex justify-center")
+            //- Chat box
+            div(class="w-full max-w-md flex flex-col justify-between border rounded-xl bg-white shadow-md h-[400px] overflow-hidden")
+
+                //- Khung tin nhắn
+                div(class="flex-1 overflow-y-auto p-4 space-y-2" id="chat-messages")
+
+                    each message in chatList.sort((a, b) => new Date(a.time) - new Date(b.time))
+                        //- Tin nhắn của mình == true , không phai sẽ false
+                        -const isMine = user[0].token_client === message.user_id;
+                        //- Thông tin của người gửi Gồm cả mình và người khác
+                        -const sender = userList.find(u => u.token_client === message.user_id);
+                        //-Nội dung của tin nhắn
+                        -const content = message.content;
+                        if isMine
+                            //- Tin nhắn của mình (không cần hiện tên người gửi)
+                            div(class="flex justify-end")
+                                div(class="bg-blue-500 text-white px-4 py-2 rounded-2xl max-w-[70%] text-sm shadow")
+                                    | #{content}
+                        else
+                            //- Tin nhắn của người khác (thêm đoạn hiện tên người gửi)
+                            div(class="flex justify-start")
+                                div(class="bg-gray-200 text-gray-800 px-4 py-2 rounded-2xl max-w-[70%] text-sm shadow")
+                                    b #{sender.fullname || 'Người lạ'}:
+                                    br
+                                    | #{content}
+
+                //- Form gửi tin nhắn
+                form(class="flex items-center gap-2 border-t p-3")
+                    input(type="text" placeholder="Nhập tin nhắn..." class="flex-1 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" id="message-input")
+                    button(type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition" id="send-button")
+                        <i class="fa-solid fa-paper-plane fa-beat" style="color: #FFD43B;"></i>
+
+
+    script(src="/socket.io/socket.io.js")
+    //- chú ý phải có dấu chấm ở sau script để thể hiện script này là bên client
+    script.
+        function getCookie(name) {
+            let cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                let c = cookies[i].trim();
+                if (c.startsWith(name + '=')) {
+                    return c.substring(name.length + 1);
+                }
+            }
+            return null;
+        }
+        const socket = io();
+        //- Khi người dùng gửi tin nhắn
+        const button = document.querySelector('#send-button');
+        console.log(button)
+        button.addEventListener('click', function(event) {
+            event.preventDefault(); // Ngăn chặn hành vi mặc định của form
+            const input = document.querySelector('#message-input');
+            const message = input.value;
+            if (message) {
+                //- Gửi tin nhắn đến server
+                socket.emit('chat message', message);
+                input.value = ''; // Xóa ô nhập sau khi gửi
+            }
+        });
+
+         //- Nhận tin nhắn từ server và hiển thị
+        socket.on('server return', function(data) {
+            const { user_id, name, content } = data; // Lấy dữ liệu từ server
+            //- Tin nhắn của mình == true , không phai sẽ false
+            const isMine = getCookie("token_client") === user_id;
+            //- Thông tin của người gửi Gồm cả mình và người khác
+            //- -const sender = userList.find(u => u.token_client === user_id); Không có userList vì đây là js client không phải pug
+            const sender = name || 'Người lạ';
+            //- ý tưởng là mỗi khi nhận được tin nhắn từ server sẽ thêm vào cuối khung chat
+            var chatMessages = document.getElementById('chat-messages');
+            var newMessage = document.createElement('div');
+            //- Gán vào cuối khung chat
+            chatMessages.appendChild(newMessage);
+            //- Chỉnh lại nội dung của tin nhắn
+            if (isMine) {
+                newMessage.className = 'flex justify-end';
+                newMessage.innerHTML = `<div class="bg-blue-500 text-white px-4 py-2 rounded-2xl max-w-[70%] text-sm shadow">${content}</div>`;
+            } else {
+                newMessage.className = 'flex justify-start';
+                newMessage.innerHTML = `<div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-2xl max-w-[70%] text-sm shadow"><b>${sender}:</b><br>${content}</div>`;
+            }
+            console.log(newMessage);
+            //- Cuộn xuống cuối khung chat
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });

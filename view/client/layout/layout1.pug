@@ -3,13 +3,23 @@ doctype html
 html(lang="en")
     head
         meta(charset="UTF-8")
-        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
         title Document
-        link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css")
-        link(rel="stylesheet", href="/css/client/style.css")
+        link(rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css")
+        link(rel="stylesheet" href="/css/client/style.css")
         script(src="https://cdn.tailwindcss.com")
+        <script src="https://kit.fontawesome.com/a841fffc09.js" crossorigin="anonymous"></script>
     body
         include ../partials/header.pug
         block main_1
         include ../partials/footer.pug
+        //- 👉 Nút nổi chat (nằm ở góc dưới bên phải nếu người dùng đã đăng nhập)
+        if user 
+            a(
+                href="/chat",
+                class="fixed bottom-6 right-6 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-300"
+                title="Chat với chúng tôi"
+            )
+                <i class="fa-brands fa-rocketchat fa-bounce" style="color: #FFD43B;"></i>
+
         script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js") 
