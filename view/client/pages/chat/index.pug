@@ -4,6 +4,7 @@
 extend ../../layout/layout1.pug
 
 block main_1
+    div(class="custom-file-container" data-upload-id="abd")
     if user
         h2(class="text-2xl font-bold mb-4 text-center") Chat
 
@@ -16,41 +17,63 @@ block main_1
         //- tạm thời chưa có data lên sẽ mô phổng dữ liệu
 
         //- Container căn giữa khung chat
+        //- Chat container
         div(class="flex justify-center")
-            //- Chat box
             div(class="w-full max-w-md flex flex-col justify-between border rounded-xl bg-white shadow-md h-[400px] overflow-hidden")
 
-                //- Khung tin nhắn
+                //- Chat messages container
                 div(class="flex-1 overflow-y-auto p-4 space-y-2" id="chat-messages")
-
                     each message in chatList.sort((a, b) => new Date(a.time) - new Date(b.time))
-                        //- Tin nhắn của mình == true , không phai sẽ false
-                        -const isMine = user[0].token_client === message.user_id;
-                        //- Thông tin của người gửi Gồm cả mình và người khác
-                        -const sender = userList.find(u => u.token_client === message.user_id);
-                        //-Nội dung của tin nhắn
-                        -const content = message.content;
+                        - const isMine = user[0].token_client === message.user_id;
+                        - const sender = userList.find(u => u.token_client === message.user_id);
+                        - const content = message.content;
                         if isMine
-                            //- Tin nhắn của mình (không cần hiện tên người gửi)
-                            div(class="flex justify-end")
+                            div(class="flex justify-end mb-2")
                                 div(class="bg-blue-500 text-white px-4 py-2 rounded-2xl max-w-[70%] text-sm shadow")
                                     | #{content}
+                                    if message.imgage && message.imgage.length
+                                        div(class="flex justify-end gap-2 mt-2 flex-wrap")
+                                            each image in message.imgage
+                                                div(class="w-1/3")
+                                                    img(src=image, class="rounded-lg max-h-32 object-cover shadow")
                         else
-                            //- Tin nhắn của người khác (thêm đoạn hiện tên người gửi)
-                            div(class="flex justify-start")
+                            div(class="flex justify-start mb-2")
                                 div(class="bg-gray-200 text-gray-800 px-4 py-2 rounded-2xl max-w-[70%] text-sm shadow")
                                     b #{sender.fullname || 'Người lạ'}:
                                     br
                                     | #{content}
+                                    if message.imgage && message.imgage.length
+                                        div(class="flex justify-start gap-2 mt-2 flex-wrap")
+                                            each image in message.imgage
+                                                div(class="w-1/3")
+                                                    img(src=image, class="rounded-lg max-h-32 object-cover shadow")
 
-                //- Form gửi tin nhắn
+                //- Chat form
                 form(class="flex items-center gap-2 border-t p-3")
+                    //-Vùng hiển thị preview ảnh 
+                    div(id="image-preview" class=" overflow-x-auto overflow-y-auto pb-2 w-full max-w-full max-h-48 hide-scroll")
                     input(type="text" placeholder="Nhập tin nhắn..." class="flex-1 border rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-400" id="message-input")
+                    //-input ẩn 
+                    input(type="file" id="file-input" style="display:none;" accept="image/*" multiple)
+
+                    button(id="emoji-button" type="button" class="text-2xl p-2 hover:bg-gray-200 rounded-md")
+                        |😊
                     button(type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition" id="send-button")
-                        <i class="fa-solid fa-paper-plane fa-beat" style="color: #FFD43B;"></i>
+                        i(class="fa-solid fa-paper-plane fa-beat" style="color: #FFD43B;")
+                    button(type="button" id="click_input_file")
+                        //- Lấy từ trong fornt awesome
+                        <i class="fa-solid fa-file" style="color: #63E6BE;"></i>
 
-
+                //- Emoji picker container
+                div(id="emoji-picker-container" class="hidden absolute bg-white rounded-lg shadow-lg z-50 p-2 max-h-[300px] overflow-y-scroll border w-60 mt-2")
+                    <emoji-picker class="w-full"></emoji-picker>
+    script(src="/js/client/previewImgChat.js")
+    //- script.
+    //-     setInterval(() => {
+    //-         console.log(temp);
+    //-     }, 2000);
     script(src="/socket.io/socket.io.js")
+
     //- chú ý phải có dấu chấm ở sau script để thể hiện script này là bên client
     script.
         function getCookie(name) {
@@ -70,36 +93,167 @@ block main_1
         button.addEventListener('click', function(event) {
             event.preventDefault(); // Ngăn chặn hành vi mặc định của form
             const input = document.querySelector('#message-input');
-            const message = input.value;
-            if (message) {
+            const message = {
+                text: input.value,
+                image: temp // mảng các file ảnh đã chọn trong previewImgChat.js
+            }
+            if (message.text.trim() !== '' || message.image.length !== 0) {
                 //- Gửi tin nhắn đến server
                 socket.emit('chat message', message);
                 input.value = ''; // Xóa ô nhập sau khi gửi
+                imagePreview.innerHTML = ''; // Xóa vùng hiển thị preview ảnh sau khi gửi
+                temp = []; // Xóa mảng ảnh đã chọn sau khi gửi
             }
         });
 
-         //- Nhận tin nhắn từ server và hiển thị
+            //- Nhận tin nhắn từ server và hiển thị
         socket.on('server return', function(data) {
-            const { user_id, name, content } = data; // Lấy dữ liệu từ server
-            //- Tin nhắn của mình == true , không phai sẽ false
+            const { user_id, name, content, image } = data;
             const isMine = getCookie("token_client") === user_id;
-            //- Thông tin của người gửi Gồm cả mình và người khác
-            //- -const sender = userList.find(u => u.token_client === user_id); Không có userList vì đây là js client không phải pug
             const sender = name || 'Người lạ';
-            //- ý tưởng là mỗi khi nhận được tin nhắn từ server sẽ thêm vào cuối khung chat
+            if (content.trim() === '' && image.length === 0) return;
+
+            const chatMessages = document.getElementById('chat-messages');
+
+            // Outer wrapper: căn phải/trái
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = `flex ${isMine ? 'justify-end' : 'justify-start'} mb-2`;
+
+            // Nội dung tin nhắn (text + ảnh)
+            const messageBox = document.createElement('div');
+            messageBox.className = `${isMine ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} px-4 py-2 rounded-2xl max-w-[70%] text-sm shadow`;
+
+            // Text content
+            if (isMine) {
+                messageBox.innerHTML = content;
+            } else {
+                messageBox.innerHTML = `<b>${sender}:</b><br>${content}`;
+            }
+
+            // Nếu có ảnh thì thêm block ảnh ngay bên dưới nội dung
+            if (image.length > 0) {
+                const imageContainer = document.createElement('div');
+                imageContainer.className = `flex ${isMine ? 'justify-end' : 'justify-start'} gap-2 mt-2 flex-wrap`;
+
+                for (let i = 0; i < image.length; i++) {
+                    const imageDiv = document.createElement('div');
+                    imageDiv.className = 'w-1/3';
+                    const img = document.createElement('img');
+                    img.src = image[i];
+                    img.className = 'rounded-lg max-h-32 object-cover shadow';
+                    imageDiv.appendChild(img);
+                    imageContainer.appendChild(imageDiv);
+                }
+
+                messageBox.appendChild(imageContainer);
+            }
+
+            // Lắp vào khung chat
+            messageWrapper.appendChild(messageBox);
+            chatMessages.appendChild(messageWrapper);
+
+            reloaKhungdChat();
+        });
+
+        var reloaKhungdChat = ()=>{
+            var chatMessages = document.getElementById('chat-messages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        reloaKhungdChat();
+
+    script.
+        const button2 = document.querySelector('#emoji-button');
+        const input2 = document.querySelector('#message-input');
+        const emojiPicker = document.querySelector('emoji-picker');
+        const emojiPickerContainer = document.querySelector('#emoji-picker-container');
+
+        console.log(emojiPicker);
+
+        // Khi nhấn vào nút emoji, hiển thị/ẩn emoji picker
+        button2.addEventListener('click', () => {
+            emojiPickerContainer.classList.toggle('hidden'); // Ẩn/hiện emoji picker
+        });
+
+        // Lắng nghe sự kiện khi chọn emoji
+        emojiPicker.addEventListener('emoji-click', (event) => {
+            input2.value += event.detail.unicode; // Thêm emoji vào ô nhập
+            emojiPickerContainer.classList.add('hidden'); // Ẩn emoji picker sau khi chọn emoji
+        });
+
+        // Đảm bảo emoji picker tự động ẩn nếu nhấn ra ngoài nó
+        document.addEventListener('click', (event) => {
+            if (!emojiPickerContainer.contains(event.target) && !button2.contains(event.target)) {
+                emojiPickerContainer.classList.add('hidden');
+            }
+        });
+    script.
+        //- alert('Đã kết nối với server');
+        var input3 = document.getElementById('message-input');
+        // người dùng bâm enter để gửi tin nhắn
+        input3.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Ngăn chặn hành vi mặc định của form
+                button.click(); // Gọi hàm gửi tin nhắn
+            }
+        });
+        //- Báo về việc có người dùng đang typing
+        input3.addEventListener('keydown', function(event) {
+            if(event.key !== 'Enter') {
+                socket.emit('typing', 'show');
+            }
+        });
+        //- Danh sách nguời dùng đang typing
+        var typingUsers = new Set(); // Sử dụng Set để lưu trữ danh sách người dùng đang typing
+        //- Nhận thông báo có người đang typing
+
+        socket.on("server typing", function(data) {
+            const { name, user_id } = data;
+            //- alert(name + ' đang gõ...'); // Hiển thị thông báo có người đang typing
+            //- Nếu người dùng đã có trong danh sách thì không thêm vào nữa và không gửi thông báo
+            if (typingUsers.has(user_id)) return;
+            typingUsers.add(user_id); // Thêm người dùng vào danh sách typing và thực thi gửi thông báo
+            //- const isMine = getCookie("token_client") === user_id; không cần vì typing là của người khác
+            const sender = name || 'Người lạ';
+            //- ý tưởng là mỗi khi nhận được thông báo ai đó đag typing từ server sẽ thêm vào cuối khung chat
             var chatMessages = document.getElementById('chat-messages');
             var newMessage = document.createElement('div');
             //- Gán vào cuối khung chat
             chatMessages.appendChild(newMessage);
             //- Chỉnh lại nội dung của tin nhắn
-            if (isMine) {
-                newMessage.className = 'flex justify-end';
-                newMessage.innerHTML = `<div class="bg-blue-500 text-white px-4 py-2 rounded-2xl max-w-[70%] text-sm shadow">${content}</div>`;
-            } else {
-                newMessage.className = 'flex justify-start';
-                newMessage.innerHTML = `<div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-2xl max-w-[70%] text-sm shadow"><b>${sender}:</b><br>${content}</div>`;
-            }
+            newMessage.className = 'flex justify-start' + ` ${user_id}`; // Thêm class để xác định người dùng đang typing
+            newMessage.innerHTML = `<div class="bg-gray-200 text-gray-800 px-4 py-2 rounded-2xl max-w-[70%] text-sm shadow"><b>${sender}:</b><br>...</br></div>`;
             console.log(newMessage);
-            //- Cuộn xuống cuối khung chat
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            reloaKhungdChat();
+        });
+
+        //- Báo cáo server rằng người dùng đã ngừng typing
+        input3.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' ) {
+                event.preventDefault(); // Ngăn chặn hành vi mặc định của form
+                button.click(); // Gọi hàm gửi tin nhắn
+                socket.emit('typing', 'hide'); // Gửi thông báo đã ngừng typing đến server
+            } else {
+                setTimeout(() => {
+                    socket.emit('typing', 'hide'); // Gửi thông báo đã ngừng typing đến server sau mỗi 3 giây không có hành động nào
+                }, 3000);
+            }
+
+        });
+        var buttonSubmitChat = document.getElementById('send-button');
+        buttonSubmitChat.addEventListener('click', function(event) {
+            event.preventDefault(); // Ngăn chặn hành vi mặc định của form
+            socket.emit('typing', 'hide'); // Gửi thông báo đã ngừng typing đến server
+        });
+
+        // - khi nhận được sự đồng thái từ server sẽ xóa tin nhắn đang typing
+        socket.on('server drop typing', function(data) {
+            const { name, user_id } = data;
+            typingUsers.delete(user_id); // Xóa người dùng khỏi danh sách typing
+            // tìm tới typing của user và xóa
+            var chatMessages = document.querySelector(`.${user_id}`);  
+            while(chatMessages) {
+                //- alert('Gọi Xóa')
+                chatMessages.remove(); // Xóa thông báo người dùng đang typin
+            }
+            reloaKhungdChat();
         });

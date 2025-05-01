@@ -4,7 +4,7 @@ ob = {
     user_id: String, // để biết ai là người gửi tin nhắn
     room_id: String, // để biết tin nhắn này thuộc phòng nào
     content: String, // nội dung tin nhắn
-    imgage: String, // hình ảnh đính kèm
+    imgage: Array, // hình ảnh đính kèm
     time: { // thời gian gửi tin nhắn
         type: Date,
         default: Date.now
