@@ -216,7 +216,12 @@ block main_1
             const sender = name || 'Người lạ';
             //- ý tưởng là mỗi khi nhận được thông báo ai đó đag typing từ server sẽ thêm vào cuối khung chat
             var chatMessages = document.getElementById('chat-messages');
-            var newMessage = document.createElement('div');
+            var newMessage;
+            if(chatMessages.querySelector(`.${user_id}`)) {
+                newMessage = chatMessages.querySelector(`.${user_id}`);
+            } else {
+                newMessage = document.createElement('div');
+            }
             //- Gán vào cuối khung chat
             chatMessages.appendChild(newMessage);
             //- Chỉnh lại nội dung của tin nhắn
@@ -233,8 +238,10 @@ block main_1
                 button.click(); // Gọi hàm gửi tin nhắn
                 socket.emit('typing', 'hide'); // Gửi thông báo đã ngừng typing đến server
             } else {
+                console.log("1 set");
                 setTimeout(() => {
                     socket.emit('typing', 'hide'); // Gửi thông báo đã ngừng typing đến server sau mỗi 3 giây không có hành động nào
+                    console.log("1 set gp");
                 }, 3000);
             }
 
@@ -245,15 +252,19 @@ block main_1
             socket.emit('typing', 'hide'); // Gửi thông báo đã ngừng typing đến server
         });
 
-        // - khi nhận được sự đồng thái từ server sẽ xóa tin nhắn đang typing
+        // - khi nhận được sự đồng ý từ server sẽ xóa tin nhắn đang typing
         socket.on('server drop typing', function(data) {
+            console.log(data);
             const { name, user_id } = data;
+                // tìm tới typing của user và xóa
             typingUsers.delete(user_id); // Xóa người dùng khỏi danh sách typing
-            // tìm tới typing của user và xóa
-            var chatMessages = document.querySelector(`.${user_id}`);  
-            while(chatMessages) {
-                //- alert('Gọi Xóa')
-                chatMessages.remove(); // Xóa thông báo người dùng đang typin
+            var chatMessages = document.querySelector(`.${user_id}`);
+            if (chatMessages) {
+                console.log("Gọi xóa")
+                console.log(chatMessages)
+                while (chatMessages.firstChild) {
+                    chatMessages.removeChild(chatMessages.firstChild);
+                }
             }
-            reloaKhungdChat();
+        reloaKhungdChat();
         });

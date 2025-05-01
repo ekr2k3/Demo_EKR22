@@ -1,8 +1,9 @@
 //chat.controller.js
 var chatModel = require('../../models/chat.model');
 var userModel = require('../../models/user.model');
-var uploadCloudinary = require('../../config/configUpload');
+
 module.exports.getChatList = async (req, res) => {
+    var uploadCloudinary = require('../../config/configUpload');
     ioF.once('connection', (socket) => {
         //Đăng ký sự kiện chat message cho client đang kết lối thức object socket
         socket.on('chat message', async (msg) => {
