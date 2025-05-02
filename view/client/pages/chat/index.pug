@@ -151,7 +151,9 @@ block main_1
             // Lắp vào khung chat
             messageWrapper.appendChild(messageBox);
             chatMessages.appendChild(messageWrapper);
-
+            if(gallery) {
+                gallery.update(); // Cập nhật gallery sau khi thêm ảnh mới
+            }
             reloaKhungdChat();
         });
 
@@ -269,4 +271,4 @@ block main_1
         });
 
     script.
-        const gallery = new Viewer(document.getElementById('chat-messages'));
+        var gallery = new Viewer(document.getElementById('chat-messages'));
