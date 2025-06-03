@@ -1,0 +1,65 @@
+
+//- DanhSachNguoiDung.pug
+
+extend ../../layout/layout1.pug
+
+block main_1
+    if user
+        include ../../partials/FriendPage.pug
+        h2(class="text-2xl font-bold mb-4 text-center") Danh sách người dùng 
+        .flex.flex-col.items-center
+            .w-full.max-w-2xl
+                .bg-white.shadow-md.rounded-lg.p-6
+                    .overflow-x-auto
+                        table.w-full.text-left.text-sm.text-gray-500
+                            thead.bg-gray-50.text-xs.text-gray-700.uppercase
+                                tr
+                                    th.px-6.py-3 Tên người dùng
+                                    th.px-6.py-3 Thao tác
+                            tbody.text-base.text-gray-900
+                                each user in listUser
+                                    tr(class="border-b border-gray-200 hover:bg-gray-100" token=user.token_client)
+                                        td.px-6.py-4 #{user.fullname}
+                                        td.px-6.py-4
+                                            button(status="send" class="px-4 py-2 bg-blue-600 text-white rounded-lg" token=user.token_client)= "Gửi lời mời kết bạn"
+    script(src="/socket.io/socket.io.js")
+    script.
+        const socket = io();
+        var listButtonOfUser = document.querySelectorAll("button[status='send']")
+        listButtonOfUser.forEach(function(button) {
+            button.addEventListener("click", function() {
+                token = button.getAttribute("token");
+                status = button.getAttribute("status");
+                if(status == "send") {
+                    button.setAttribute("status", "cancel");
+                    button.innerHTML = "Hủy lời mời kết bạn";
+                    button.setAttribute("class", "px-4 py-2 bg-red-600 text-white rounded-lg");
+                    socket.emit("sendFriendRequest", {
+                        token: token
+                    })
+                } else {
+                    button.setAttribute("status", "send");
+                    button.innerHTML = "Gửi lời mời kết bạn";
+                    button.setAttribute("class", "px-4 py-2 bg-blue-600 text-white rounded-lg");
+                    socket.emit("cancelFriendRequest", {
+                        token: token
+                    })
+                }
+            })
+        })
+    script(src="/js/client/socketFriend.js") 
+    script.
+        socket.on('hiddenAfter',(data)=>{
+            if(data.token == getCookie("token_client")) {
+                
+                var tr = document.querySelector("tr[token='" + data.sendMyInfoToOtherPeople.token_client + "']");
+
+                console.log(data); // kiểm tra xem dữ liệu có đúng không
+                console.log(tr); // kiểm tra xem tr có tồn tại không
+                if(tr) {
+                    tr.style.display = "none";
+                }
+            }
+        })
+
+    

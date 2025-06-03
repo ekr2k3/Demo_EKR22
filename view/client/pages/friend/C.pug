@@ -1,0 +1,110 @@
+//- requestToMe.pug
+
+extend ../../layout/layout1.pug
+
+block main_1
+    if user
+        include ../../partials/FriendPage.pug
+        h2(class="text-2xl font-bold mb-4 text-center") Danh sách request To Me 
+        .flex.flex-col.items-center
+            .w-full.max-w-2xl
+                .bg-white.shadow-md.rounded-lg.p-6
+                    .overflow-x-auto
+                        table.w-full.text-left.text-sm.text-gray-500
+                            thead.bg-gray-50.text-xs.text-gray-700.uppercase
+                                tr
+                                    th.px-6.py-3 Tên người dùng
+                                    th.px-6.py-3 Thao tác
+                            tbody.text-base.text-gray-900
+                                each user in MylistRequest
+                                    tr(class="border-b border-gray-200 hover:bg-gray-100" token=user.token_client)
+                                        td.px-6.py-4 #{user.fullname}
+                                        td.px-6.py-4
+                                            button(name="chapNhan" class="px-4 py-2 bg-blue-600 text-white rounded-lg" token=user.token_client)= "Chấp nhận"
+                                            button(name="tuChoi" class="px-4 py-2 bg-red-600 text-white rounded-lg" token=user.token_client)= "Từ chối"
+    script(src="/socket.io/socket.io.js")
+    script.
+        const socket = io();
+        var listButtonOfUserChapNhan = document.querySelectorAll("button[name='chapNhan']")
+        var listButtonOfUserTuChoi = document.querySelectorAll("button[name='tuChoi']")
+
+        /*
+        Khi người dùng chấp nhận 
+        1. Ẩn Đi khối ngoài (tức ẩn đi record) --> Đã gán thuộc tính token cho tr
+        2. Gửi thông tin token của người mà ta đã chấp nhận dùng tới server để xử lý
+        */
+        listButtonOfUserChapNhan.forEach(button => {
+            button.addEventListener("click", function() {
+                // 1. Ẩn đi record
+                this.parentElement.parentElement.style.display = "none"; // tr td button --> cần 2 lần parentElement để truy vấn tới tr
+                // 2. Gửi thông tin token của người mà ta đã chấp nhận dùng tới server để xử lý
+                var token = this.getAttribute("token");
+                socket.emit("chapNhanRequestToMe", { token: token });
+            });
+        });
+
+        /*
+        Khi người dùng từ chối
+        1. Ẩn Đi khối ngoài (tức ẩn đi record) --> Đã gán thuộc tính token cho tr
+        2. Gửi thông tin token của người mà ta đã từ chối dùng tới server để xử lý
+        */
+        listButtonOfUserTuChoi.forEach(button => {
+            button.addEventListener("click", function() {
+                // 1. Ẩn đi record
+                this.parentElement.parentElement.style.display = "none"; // tr td button --> cần 2 lần parentElement để truy vấn tới tr
+                // 2. Gửi thông tin token của người mà ta đã từ chối dùng tới server để xử lý
+                var token = this.getAttribute("token");
+                socket.emit("tuChoiRequestToMe", { token: token });
+            });
+        });
+    script(src="/js/client/socketFriend.js")
+    script.
+        // Lắng nghe sự kiện mà server gửi để bắt data
+        socket.on("updateReqToMe_of_other_pp",(data)=>{
+            if(data.token === getCookie("token_client")) // Xác nhận xem data có phải gửi cho bản thân không
+            {
+                console.log(data.sendMyInfoToOtherPeople); // Kiểm tra data được gửi tới trước khi code
+                // Tạo khối mới để hiển thị data
+                var newRow = document.createElement("tr");
+                newRow.className = "border-b border-gray-200 hover:bg-gray-100";
+                newRow.setAttribute("token", data.sendMyInfoToOtherPeople.token_client);
+                newRow.innerHTML = `
+                    <td class="px-6 py-4">${data.sendMyInfoToOtherPeople.fullname}</td>
+                    <td class="px-6 py-4">
+                        <button name="chapNhan" class="px-4 py-2 bg-blue-600 text-white rounded-lg" token="${data.sendMyInfoToOtherPeople.token_client}">Chấp nhận</button>
+                        <button name="tuChoi" class="px-4 py-2 bg-red-600 text-white rounded-lg" token="${data.sendMyInfoToOtherPeople.token_client}">Từ chối</button>
+                    </td>
+                `;
+                // Thêm khối mới vào tbody
+                var tbody = document.querySelector("tbody.text-base.text-gray-900");
+                tbody.appendChild(newRow);
+                console.log(tbody);
+
+                // Cập nhật lại các button mới được thêm vào
+                var newButtonChapNhan = newRow.querySelector("button[name='chapNhan']");
+                var newButtonTuChoi = newRow.querySelector("button[name='tuChoi']");
+                newButtonChapNhan.addEventListener("click", function() {
+                    this.parentElement.parentElement.style.display = "none"; // Ẩn đi record
+                    var token = this.getAttribute("token");
+                    socket.emit("chapNhanRequestToMe", { token: token });
+                });
+                newButtonTuChoi.addEventListener("click", function() {
+                    this.parentElement.parentElement.style.display = "none"; // Ẩn đi record
+                    var token = this.getAttribute("token");
+                    socket.emit("tuChoiRequestToMe", { token: token });
+                });
+            }
+            
+            //
+            socket.on('updateReqToMe_of_other_pp_Cancel',(data) => {
+                if(data.token === getCookie("token_client")) { // Xác nhận xem data có phải gửi cho bản thân không
+                    var rows = document.querySelectorAll("tr[token='" + data.sendMyTokenToOtherPeople + "']");
+                    console.log(rows); // in để kiểm tra
+                    if (rows.length > 0) {
+                        for (var i = 0; i < rows.length; i++) {
+                            rows[i].style.display = "none"; // Ẩn đi record
+                        }
+                    }
+                }
+            });
+        })

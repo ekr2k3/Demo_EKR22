@@ -6,6 +6,7 @@ extend ../../layout/layout1.pug
 block main_1
     div(class="custom-file-container" data-upload-id="abd")
     if user
+        include ../../partials/FriendPage.pug
         h2(class="text-2xl font-bold mb-4 text-center") Chat
 
         //- mô tả các khối
@@ -272,3 +273,20 @@ block main_1
 
     script.
         var gallery = new Viewer(document.getElementById('chat-messages'));
+    script(src="/js/client/socketFriend.js") 
+    script.
+        var getCookies = function(name) {
+            var value = "; " + document.cookie;
+            var parts = value.split("; " + name + "=");
+            if (parts.length == 2) return parts.pop().split(";").shift();
+        };
+        socket.on("connect", function() {
+            console.log("Connected to server from chat all page");
+            var token_client = getCookies("token_client");
+            console.log("Token client:", token_client);
+            if (token_client !== undefined) {
+                socket.emit("joinWeb", { token: { token_client: token_client } });
+            } else {
+                console.log("No token found, not joining room");
+            }
+        });

@@ -33,7 +33,13 @@ var schemaUser = new mongoose.Schema({
     token_client: { // định danh người dùng
         type: String,
         default: generateRandomString // tạo token, mục đích random để tránh bị trùng nhau
-    }
+    },
+    myListFriend : [{
+        idUser: String, // lưu lại token_client của người dùng khác
+        id_room: String
+    }],
+    requestToMe : Array, // danh sách bạn bè có thể xét duyệt
+    requestToOtherPepole : Array, // danh sách người dùng đang xét duyệt ta
 });
 
 module.exports = mongoose.model("users", schemaUser);

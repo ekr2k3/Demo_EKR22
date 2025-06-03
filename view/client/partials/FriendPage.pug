@@ -1,0 +1,9 @@
+//- partials của các khối chuyển hướng tới các trang nhóm friend
+//- css by GPT
+div(class="container mx-auto mt-6 space-y-4")
+    div(class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0")
+        a(href="/friend/listuser" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition") Danh sách người dùng A
+        a(href="/friend/listfriend" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition") Danh sách bạn bè B
+        a(href="/friend/listrequest" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition") RequestToMe  C
+            span(class="inline-flex items-center justify-center w-6 h-6 text-xs font-bold bg-red-500 text-white rounded-full") #{user[0].requestToMe.length}
+        a(href="/friend/listSent" class="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition") RequestToOtherPepole  D

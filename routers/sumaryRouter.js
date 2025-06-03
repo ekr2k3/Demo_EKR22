@@ -21,6 +21,8 @@ var middlewareUser = require('../middleware/user.middleware.js');
 var routerAdminSetting = require('../routers/server/setting.router.js');
 var middlewareSetting = require('../middleware/setting.middleware.js');
 var routerChat = require('./client/chat/chat.router.js');
+
+var routerFriendClient = require('./client/friend.router.js');
 module.exports = (app)=>{
     app.use(middlewareSetting)
     app.use(middlewareUser);
@@ -39,7 +41,7 @@ module.exports = (app)=>{
     app.use('/user', routerUser);
     app.use(prefix + '/setting', middlewareAuth.checkLogin, routerAdminSetting);
     app.use('/chat', routerChat);
-
+    app.use('/friend', routerFriendClient); //router nhóm friend
     // app.use(*,..) luôn ở cuối cùng
     app.get("*", (req, res)=>{
         res.render('./404/404.pug')

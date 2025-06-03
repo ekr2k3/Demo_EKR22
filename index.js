@@ -13,6 +13,8 @@ const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 global.ioF = io; // cho phép sử dụng io ở các file khác với tên mới tùy chọn 
+var socketHandler = require('./socketHandler');
+socketHandler(io); //  để giúp user tham gia + đăng ký các sự kiện socket cho các user tham gia
 
 
 app.use(cookieParser("anystring")); // Nhập chuỗi bất kỳ

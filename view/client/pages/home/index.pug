@@ -26,3 +26,21 @@ block main_1
                 -var newPrice = datanew[i].price - datanew[i].price * datanew[i].discountPercentage/100
                 p= newPrice
         -}
+    script(src="/socket.io/socket.io.js")
+    script.
+        var getCookies = function(name) {
+            var value = "; " + document.cookie;
+            var parts = value.split("; " + name + "=");
+            if (parts.length == 2) return parts.pop().split(";").shift();
+        };
+        const socket = io();
+        socket.on("connect", function() {
+            console.log("Connected to server from home page");
+            var token_client = getCookies("token_client");
+            console.log("Token client:", token_client);
+            if (token_client !== undefined) {
+                socket.emit("joinWeb",{ token: { token_client: token_client } });
+            } else {
+                console.log("No token found, not joining room");
+            }
+        });
