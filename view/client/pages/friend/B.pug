@@ -21,7 +21,10 @@ block main_1
                                     tr(class="border-b border-gray-200 hover:bg-gray-100" token=user.token_client)
                                         td.px-6.py-4 #{user.fullname}
                                         td.px-6.py-4
-                                            button(class="px-4 py-2 bg-blue-600 text-white rounded-lg" token=user.token_client)= "Nhắn tin" 
+                                            a(class="px-4 py-2 bg-blue-600 text-white rounded-lg" 
+                                                token=user.token_client
+                                                href=`/chat/${user.roomID}`
+                                            )= "Nhắn tin" 
     script(src="/socket.io/socket.io.js")
     script.
         var getCookies = function(name) {

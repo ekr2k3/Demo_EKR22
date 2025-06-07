@@ -1,20 +1,24 @@
 var userModel = require('../../models/user.model')
-
+var roomChatModel = require('../../models/room-chat.model'); // Import model room-chat
 
 module.exports.listuser = async (req, res) => {
     // Loại trừ bản thân người dùng
     var myToken = res.locals.user[0].token_client;
     // loại trừ những người đã kết bạn
     var myListFriend = res.locals.user[0].myListFriend; // 1 list các token của người khác
-    // loại trừ những người đã gửi lời mời kết bạn
+    // loại trừ những người tôi đã gửi lời mời kết bạn
     var requestToOtherPepole = res.locals.user[0].requestToOtherPepole; // 1 list các token của người khác
+    // loại trừ những người đã gửi lời mời kết bạn tới tôi
+    var requestToMe = res.locals.user[0].requestToMe; // 1 list các token của người khác
 
     var allUser = await userModel.find({});
     // Duyệt qua toàn bộ người dùng và đưa vào danh sách những record không có trong loại trừ
     var listUser = [];
     for (var i = 0; i < allUser.length; i++) {
         var token = allUser[i].token_client;
-        if (token != myToken && !myListFriend.some(friend => friend.idUser === token) && !requestToOtherPepole.some(user => user.token_client === token)) {
+        if (token != myToken && !myListFriend.some(friend => friend.idUser === token) &&
+            !requestToOtherPepole.some(user => user.token_client === token)
+            && !requestToMe.some(user => user.token_client === token)) {
             listUser.push(allUser[i]);
         }
     }
@@ -47,6 +51,10 @@ module.exports.listuser = async (req, res) => {
                 token: data.token, // token của người dùng khác
                 sendMyInfoToOtherPeople: myUser // Gửi thông tin của mình cho người khác
             });
+            socket.broadcast.emit('removeOneReqToMe', {
+                token: data.token, // token của người dùng khác
+                sendMyInfoToOtherPeople: myUser // Gửi thông tin của mình cho người khác
+            });
         });
         socket.on('cancelFriendRequest', async (data) => {
             console.log('kiểm tra sự kiện hủy Gửi lời mời kết bạn');
@@ -71,6 +79,10 @@ module.exports.listuser = async (req, res) => {
             socket.broadcast.emit('updateReqToMe_of_other_pp_Cancel', {
                 token: data.token, // token của người dùng khác
                 sendMyTokenToOtherPeople: myUser.token_client // Gửi thông tin của mình cho người khác
+            });
+            socket.broadcast.emit('addOneReqToMe', {
+                token: data.token, // token của người dùng khác
+                sendMyInfoToOtherPeople: myUser // Gửi thông tin của mình cho người khác
             });
         });
     });
@@ -128,6 +140,7 @@ module.exports.listrequest = async (req, res) => {
             Xóa idA trong requestToMe của B
             xóa idB trong requestToOtherPepole  của A
         */
+
         socket.on('chapNhanRequestToMe', async (data) => {
             console.log('Đã kích hoạt thành công sự kiện chapNhanRequestToMe');
             console.log(data); // Kiểm tra dữ liệu nhận được
@@ -137,8 +150,17 @@ module.exports.listrequest = async (req, res) => {
             var myUser = await userModel.findOne({ token_client: myToken }); // Tìm tới Người B (là người hiện tại)
             if (otherPeople && myUser) {
                 // Tạo id_room mới
-                // var id_room = myToken + otherPeople.token_client; // Tạo id_room bằng cách ghép token của 2 người
-                var id_room = ""; // Tạm để = ""
+                var roomChat = new roomChatModel({
+                    typeofRoom: "private", // Loại phòng chat là private (2 người)
+                    status: "active", // Trạng thái phòng chat
+                    user: [
+                        { user_id: myToken, role: "admin" }, // Người B (là người hiện tại) với vai trò admin
+                        { user_id: otherPeople.token_client, role: "admin" } // Người A với vai trò admin
+                    ]
+                }); // Tạo một instance mới của roomChatModel
+                await roomChat.save(); // Lưu phòng chat mới vào cơ sở dữ liệu
+                console.log("Phòng chat mới đã được tạo:", roomChat);
+                var id_room = roomChat._id; // Lấy id của phòng chat mới tạo
 
                 // Thêm vào myListFriend của B
                 myUser.myListFriend.push({ idUser: otherPeople.token_client, id_room: id_room });
@@ -309,7 +331,11 @@ module.exports.listfriend = async (req, res) => {
             MylistFriend.push(user);
         }
     }
-
+    // Gán id phòng chat riêng mình và người khác vào từng người dùng trong MylistFriend
+    for(var i = 0; i< MylistFriend.length; i++) {
+        MylistFriend[i].roomID = myListFriend[i].id_room; // roomID là attribute được thêm vào từng người dùng trong MylistFriend
+        // Gán id phòng chat riêng của mình và người khác vào từng người dùng trong MylistFriend
+    }
     // Đưa sang pug
     res.render('client/pages/friend/B.pug', {
         MylistFriend: MylistFriend,

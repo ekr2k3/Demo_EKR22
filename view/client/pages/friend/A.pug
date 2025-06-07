@@ -61,5 +61,28 @@ block main_1
                 }
             }
         })
+    script.
+        // A gửi kết bạn đến B, B ẩn đi thông tin về A
+        socket.on('removeOneReqToMe',(data)=>{
+            if(data.token == getCookie("token_client")) {
+                var tr = document.querySelector("tr[token='" + data.sendMyInfoToOtherPeople.token_client + "']");
+                console.log(data); // kiểm tra xem dữ liệu có đúng không
+                console.log(tr); // kiểm tra xem tr có tồn tại không
+                if(tr) {
+                    tr.style.display = "none";
+                }
+            }
+        })
+        // A hủy gửi kết bạn đến B, B hiện lại thông tin về A
+        socket.on('addOneReqToMe',(data)=>{
+            if(data.token == getCookie("token_client")) {
+                var tr = document.querySelector("tr[token='" + data.sendMyInfoToOtherPeople.token_client + "']");
+                console.log(data); // kiểm tra xem dữ liệu có đúng không
+                console.log(tr); // kiểm tra xem tr có tồn tại không
+                if(tr) {
+                    tr.style.display = "table-row";
+                }
+            }
+        })
 
     

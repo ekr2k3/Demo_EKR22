@@ -5,6 +5,7 @@ var userModel = require('../../models/user.model');
 module.exports.getChatList = async (req, res) => {
     var uploadCloudinary = require('../../config/configUpload');
     ioF.once('connection', (socket) => {
+        socket.join(req.params.id_room); // Kết nối socket với id phòng chat
         //Đăng ký sự kiện chat message cho client đang kết lối thức object socket
         socket.on('chat message', async (msg) => {
             // upload từng ảnh lên cloudinary
@@ -29,6 +30,7 @@ module.exports.getChatList = async (req, res) => {
             if (msg.image.length > 0) {
                 data.imgage = msg.image; // Nếu có ảnh thì gán ảnh vào data
             }
+            data.room_id = req.params.id_room; // Lấy id phòng từ params
             const chat = new chatModel(data);
             console.log(socket.id);
             await chat.save();
@@ -40,7 +42,7 @@ module.exports.getChatList = async (req, res) => {
                 name: res.locals.user[0].fullname, // lấy tên của người nào đó gửi tin nhắn
                 image: msg.image, // lấy ảnh từ client nào đó gửi lên
             };
-            ioF.emit('server return', objectChat);
+            ioF.to(req.params.id_room).emit('server return', objectChat);
         });
         socket.on("typing", (flag) => {
             var objectTyping = {
@@ -49,19 +51,37 @@ module.exports.getChatList = async (req, res) => {
             };
             switch (flag) {
                 case 'show':
-                    socket.broadcast.emit('server typing', { name: res.locals.user[0].fullname, user_id: res.locals.user[0].token_client });
+                    socket.to(req.params.id_room).emit('server typing', { name: res.locals.user[0].fullname, user_id: res.locals.user[0].token_client });
                     break;
                 case 'hide':
-                    socket.broadcast.emit('server drop typing', { name: res.locals.user[0].fullname, user_id: res.locals.user[0].token_client });
+                    socket.to(req.params.id_room).emit('server drop typing', { name: res.locals.user[0].fullname, user_id: res.locals.user[0].token_client });
                     break;
             }
         });
     });
 
     // Lấy danh sách chat từ database
-    var chatList = await chatModel.find({});
+    var chatList = await chatModel.find({
+        room_id: req.params.id_room // Lấy chat theo id phòng
+    });
     // Lấy danh sách người dùng từ database
     var userList = await userModel.find({});
+    
+    var temp = [];
+    for(let i = 0; i < userList.length; i++) {
+        for(let j = 0; j < userList[i].myListFriend.length; j++) {
+            // console.log(userList[i].myListFriend[j].id_room + " == " + req.params.id_room);
+            if(userList[i].myListFriend[j].id_room == req.params.id_room) {
+                console.log("hello" + i);
+                temp.push(userList[i]);
+                break; // Nếu đã tìm thấy id_room thì không cần kiểm tra tiếp
+            }
+        }
+    };
+    userList = temp; // Lọc danh sách người dùng theo id phòng
+    // console.log("form chat.controller.js");
+    // console.log(chatList);
+    // console.log(userList);
     res.render('client/pages/chat/index.pug', {
         chatList: chatList,
         userList: userList
